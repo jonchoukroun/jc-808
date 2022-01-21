@@ -28,6 +28,7 @@ int main(int argc, char *args[])
     AudioEngine *sine = new AudioEngine(440, 30000, AudioEngine::SINE);
     AudioEngine *square = new AudioEngine(440, 20000, AudioEngine::SQUARE);
     AudioEngine *triangle = new AudioEngine(440, 30000, AudioEngine::TRIANGLE);
+    AudioEngine *saw = new AudioEngine(440, 30000, AudioEngine::SAW);
 
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
@@ -49,6 +50,9 @@ int main(int argc, char *args[])
                         triangle->play();
                         break;
 
+                    case SDLK_4:
+                        saw->play();
+
                     default:
                         break;
                 }
@@ -65,6 +69,9 @@ int main(int argc, char *args[])
                     case SDLK_3:
                         triangle->pause();
                         break;
+
+                    case SDLK_4:
+                        saw->pause();
 
                     default:
                         break;

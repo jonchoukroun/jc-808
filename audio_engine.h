@@ -9,7 +9,8 @@ public:
     enum WaveForm {
         SINE,
         SQUARE,
-        TRIANGLE
+        TRIANGLE,
+        SAW
     };
 
     AudioEngine(int frequency, int volume, WaveForm waveform);
@@ -26,7 +27,6 @@ private:
 
     int mFrequency;
     int mVolume;
-    WaveForm mWaveform;
 
     double mTime;
     static constexpr double mTimeStep = 1.0 / (double)mSampleRate;
@@ -42,6 +42,7 @@ private:
     static double generateSine(int frequency, double time);
     static double generateSquare(int frequency, double time);
     static double generateTriangle(int frequency, double time);
+    static double generateSaw(int frequency, double time);
 };
 
 #endif
