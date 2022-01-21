@@ -1,5 +1,5 @@
 #include <iostream>
-#include "audio_engine.h"
+#include "kick_sample.h"
 #include <SDL2/SDL.h>
 
 using std::cout;
@@ -25,10 +25,7 @@ int main(int argc, char *args[])
     bool quit = false;
     SDL_Event e;
 
-    AudioEngine *sine = new AudioEngine(440, 30000, AudioEngine::SINE);
-    AudioEngine *square = new AudioEngine(440, 20000, AudioEngine::SQUARE);
-    AudioEngine *triangle = new AudioEngine(440, 30000, AudioEngine::TRIANGLE);
-    AudioEngine *saw = new AudioEngine(440, 30000, AudioEngine::SAW);
+    KickSample *kick = new KickSample();
 
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
@@ -39,19 +36,19 @@ int main(int argc, char *args[])
                         break;
 
                     case SDLK_1:
-                        sine->play();
+                        kick->play();
                         break;
 
-                    case SDLK_2:
-                        square->play();
-                        break;
+                    // case SDLK_2:
+                    //     square->play();
+                    //     break;
 
-                    case SDLK_3:
-                        triangle->play();
-                        break;
+                    // case SDLK_3:
+                    //     triangle->play();
+                    //     break;
 
-                    case SDLK_4:
-                        saw->play();
+                    // case SDLK_4:
+                    //     saw->play();
 
                     default:
                         break;
@@ -59,19 +56,19 @@ int main(int argc, char *args[])
             } else if (e.type == SDL_KEYUP) {
                 switch (e.key.keysym.sym) {
                     case SDLK_1:
-                        sine->pause();
+                        kick->pause();
                         break;
 
-                    case SDLK_2:
-                        square->pause();
-                        break;
+                    // case SDLK_2:
+                    //     square->pause();
+                    //     break;
 
-                    case SDLK_3:
-                        triangle->pause();
-                        break;
+                    // case SDLK_3:
+                    //     triangle->pause();
+                    //     break;
 
-                    case SDLK_4:
-                        saw->pause();
+                    // case SDLK_4:
+                    //     saw->pause();
 
                     default:
                         break;

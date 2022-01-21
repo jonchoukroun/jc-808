@@ -6,12 +6,10 @@
 using std::cout;
 using std::endl;
 
-AudioEngine::AudioEngine(int frequency, int volume, WaveForm waveform)
-{
-    AudioEngine::mFrequency = frequency;
-    AudioEngine::mVolume = volume;
-    AudioEngine::mTime = 0;
+const double GAIN = 10000.0;
 
+AudioEngine::AudioEngine(double (* generatorFn)(double time))
+{
     SDL_AudioSpec desiredSpec;
     desiredSpec.freq = mSampleRate;
     desiredSpec.format = AUDIO_S16;
@@ -19,24 +17,6 @@ AudioEngine::AudioEngine(int frequency, int volume, WaveForm waveform)
     desiredSpec.samples = mSampleSize;
     desiredSpec.callback = &audioCallback;
     desiredSpec.userdata = this;
-
-    switch(waveform) {
-        case SINE:
-            generateWave = &generateSine;
-            break;
-        case SQUARE:
-            generateWave = &generateSquare;
-            break;
-        case TRIANGLE:
-            generateWave = &generateTriangle;
-            break;
-        case SAW:
-            generateWave = &generateSaw;
-            break;
-        default:
-            cout << "Undefined waveform" << endl;
-            break;
-    }
 
     mDeviceId = SDL_OpenAudioDevice(
         NULL,
@@ -48,6 +28,8 @@ AudioEngine::AudioEngine(int frequency, int volume, WaveForm waveform)
     if (mDeviceId == 0) {
         cout << "Failed to open audio device! Error: " << SDL_GetError() << endl;
     }
+
+    mGeneratorFn = generatorFn;
 }
 
 AudioEngine::~AudioEngine()
@@ -65,6 +47,11 @@ void AudioEngine::pause()
     SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
 }
 
+SDL_AudioDeviceID AudioEngine::getAudioDevice()
+{
+    return mDeviceId;
+}
+
 void AudioEngine::audioCallback(void *userdata, Uint8 *stream, int len)
 {
     const auto engine = reinterpret_cast<AudioEngine *>(userdata);
@@ -75,28 +62,23 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
 {
     short *out = (short *)stream;
     for (int i = 0; i < (len / sizeof(short)); i++) {
-        double value = generateWave(mFrequency, mTime);
-        out[i] = mVolume * value;
+        double value = mGeneratorFn(mTime);
+        out[i] = GAIN * value;
         mTime += mTimeStep;
     }
 }
 
-double AudioEngine::generateSine(int frequency, double time)
-{
-    return sin(frequency * TAU * time);
-}
-
-double AudioEngine::generateTriangle(int frequency, double time)
+double generateTriangle(int frequency, double time)
 {
     return asin(sin(frequency * TAU * time)) * (2.0 / M_PI);
 }
 
-double AudioEngine::generateSquare(int frequency, double time)
+double generateSquare(int frequency, double time)
 {
     return sin(frequency * TAU * time) > 0 ? 1.0 : -1.0;
 }
 
-// double AudioEngine::generateSaw(int frequency, double time)
+// double generateSaw(int frequency, double time)
 // {
 //     double output = 0.0;
 //     for (double f = 1.0; f < 40.0; f++) {
@@ -104,7 +86,7 @@ double AudioEngine::generateSquare(int frequency, double time)
 //     }
 //     return output * (-2.0 / M_PI);
 // }
-double AudioEngine::generateSaw(int frequency, double time)
+double generateSaw(int frequency, double time)
 {
     return (2.0 / M_PI) * frequency * M_PI * fmod(time, 1.0 / frequency) - (M_PI / 2.0);
 }
