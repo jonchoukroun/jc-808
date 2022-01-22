@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "audio_engine.h"
+#include "envelope.h"
 
 class KickSample
 {
@@ -10,14 +11,12 @@ public:
     KickSample();
     ~KickSample();
 
-    void play();
-    // TODO: replace with ADSR
-    void pause();
+    void trigger();
 
 private:
     static const int mFrequency = 80;
 
-    AudioEngine *mEngine;
+    AudioEngine *mEngine = nullptr;
 
     // Will not work as non-static member function pointer
     // when passed to AudioEngine.

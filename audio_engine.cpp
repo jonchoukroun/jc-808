@@ -6,9 +6,9 @@
 using std::cout;
 using std::endl;
 
-const double GAIN = 10000.0;
+const double GAIN = 30000.0;
 
-AudioEngine::AudioEngine(double (* generatorFn)(double time))
+AudioEngine::AudioEngine(Envelope *envelope, double (* generatorFn)(double time))
 {
     SDL_AudioSpec desiredSpec;
     desiredSpec.freq = mSampleRate;
@@ -29,7 +29,12 @@ AudioEngine::AudioEngine(double (* generatorFn)(double time))
         cout << "Failed to open audio device! Error: " << SDL_GetError() << endl;
     }
 
+    mEnvelope = envelope;
     mGeneratorFn = generatorFn;
+
+    mDuration = envelope->getDuration();
+
+    mTime = 0.0;
 }
 
 AudioEngine::~AudioEngine()
@@ -44,7 +49,9 @@ void AudioEngine::play()
 
 void AudioEngine::pause()
 {
+    mTime = 0.0;
     SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
+
 }
 
 SDL_AudioDeviceID AudioEngine::getAudioDevice()
@@ -56,14 +63,18 @@ void AudioEngine::audioCallback(void *userdata, Uint8 *stream, int len)
 {
     const auto engine = reinterpret_cast<AudioEngine *>(userdata);
     engine->fillBuffer(stream, len);
+    if (engine->mTime >= engine->mDuration) {
+        engine->pause();
+    }
 }
 
 void AudioEngine::fillBuffer(const Uint8* const stream, int len)
 {
     short *out = (short *)stream;
     for (int i = 0; i < (len / sizeof(short)); i++) {
+        double amplitude = mEnvelope->getAmplitude(mTime);
         double value = mGeneratorFn(mTime);
-        out[i] = GAIN * value;
+        out[i] = GAIN * amplitude * value;
         mTime += mTimeStep;
     }
 }

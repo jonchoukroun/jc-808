@@ -36,7 +36,7 @@ int main(int argc, char *args[])
                         break;
 
                     case SDLK_1:
-                        kick->play();
+                        kick->trigger();
                         break;
 
                     // case SDLK_2:
@@ -49,26 +49,6 @@ int main(int argc, char *args[])
 
                     // case SDLK_4:
                     //     saw->play();
-
-                    default:
-                        break;
-                }
-            } else if (e.type == SDL_KEYUP) {
-                switch (e.key.keysym.sym) {
-                    case SDLK_1:
-                        kick->pause();
-                        break;
-
-                    // case SDLK_2:
-                    //     square->pause();
-                    //     break;
-
-                    // case SDLK_3:
-                    //     triangle->pause();
-                    //     break;
-
-                    // case SDLK_4:
-                    //     saw->pause();
 
                     default:
                         break;

@@ -2,11 +2,12 @@
 #define AudioEngineH
 
 #include <SDL2/SDL.h>
+#include "envelope.h"
 
 class AudioEngine
 {
 public:
-    AudioEngine(double (* generatorFn)(double time));
+    AudioEngine(Envelope *envelope, double (* generatorFn)(double time));
     ~AudioEngine();
 
     void play();
@@ -18,7 +19,10 @@ private:
     static const int mSampleRate = 44100;
     static const int mSampleSize = 512;
     static const int mChannels = 1;
-    static const int mSampleSeconds = 1;
+
+    Envelope *mEnvelope = nullptr;
+
+    double mDuration;
 
     double mTime;
     static constexpr double mTimeStep = 1.0 / (double)mSampleRate;

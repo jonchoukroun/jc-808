@@ -5,7 +5,16 @@
 
 KickSample::KickSample()
 {
-    AudioEngine *engine = new AudioEngine(&GenerateKickSample);
+    Envelope::Settings settings = {
+        .attackDuration =  0.05,
+        .decayDuration =  0.1,
+        .releaseDuration =  0.05,
+        .sustainDuration =  0.1,
+        .sustainAmplitude =  0.5,
+    };
+    Envelope *envelope = new Envelope(&settings);
+
+    AudioEngine *engine = new AudioEngine(envelope, &GenerateKickSample);
     mEngine = engine;
 }
 
@@ -14,14 +23,9 @@ KickSample::~KickSample()
     mEngine = nullptr;
 }
 
-void KickSample::play()
+void KickSample::trigger()
 {
     mEngine->play();
-}
-
-void KickSample::pause()
-{
-    mEngine->pause();
 }
 
 double KickSample::GenerateKickSample(double time)
