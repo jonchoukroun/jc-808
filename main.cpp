@@ -1,12 +1,19 @@
 #include <iostream>
-#include "kick_sample.h"
 #include <SDL2/SDL.h>
+#include <vector>
+#include "audio_engine.h"
+#include "kick.h"
+#include "snare.h"
+#include "timer.h"
 
 using std::cout;
 using std::endl;
+using std::vector;
 
 static const int SCREEN_WIDTH = 640;
 static const int SCREEN_HEIGHT = 480;
+
+static const double TICKS_PER_FRAME = 1000 / 60;
 
 
 SDL_Window *gWindow = nullptr;
@@ -20,14 +27,18 @@ int main(int argc, char *args[])
 {
     if (!init()) return -1;
 
-    std::string prompt = "Press SPACE to play sample.";
-
     bool quit = false;
     SDL_Event e;
+    Timer fpsTimer;
 
-    KickSample *kick = new KickSample();
+    AudioEngine *engine = new AudioEngine();
+    Kick *kick = new Kick();
+    Snare *snare = new Snare();
 
     while (!quit) {
+        fpsTimer.start();
+        engine->start();
+
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym) {
@@ -37,25 +48,29 @@ int main(int argc, char *args[])
 
                     case SDLK_1:
                         kick->trigger();
+                        engine->playKick(kick);
                         break;
 
-                    // case SDLK_2:
-                    //     square->play();
-                    //     break;
-
-                    // case SDLK_3:
-                    //     triangle->play();
-                    //     break;
-
-                    // case SDLK_4:
-                    //     saw->play();
+                    case SDLK_2:
+                        snare->trigger();
+                        engine->playSnare(snare);
+                        break;
 
                     default:
                         break;
                 }
             }
         }
+
+        Uint32 ticks = fpsTimer.getTicks();
+        if (ticks < TICKS_PER_FRAME) {
+            SDL_Delay(TICKS_PER_FRAME - ticks);
+        }
     }
+
+    if (fpsTimer.isRunning()) fpsTimer.stop();
+
+    engine->stop();
 
     close();
 

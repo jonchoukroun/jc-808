@@ -5,11 +5,13 @@ class Envelope
 {
 public:
     struct Settings {
-        double attackDuration;
-        double decayDuration;
-        double releaseDuration;
-        double sustainDuration;
-        double sustainAmplitude;
+        double attack;
+        double decay;
+        double sustain;
+        double release;
+
+        double peakAmp;
+        double sustainAmp;
     };
 
     Envelope(Settings *settings);
@@ -18,13 +20,16 @@ public:
     double getDuration();
 
 private:
-    double mAttackDuration;
-    double mDecayDuration;
-    double mReleaseDuration;
-    double mSustainDuration;
+    double mDuration;
+    double mAttack;
+    double mDecay;
+    double mSustain;
+    double mRelease;
 
-    double mSustainAmplitude;
-    double mTriggerAmplitude;
+    const double mStartAmp = 0.0;
+    double mPeakAmp;
+    double mSustainAmp;
+    const double mEndAmp = 0.0;
 };
 
 #endif

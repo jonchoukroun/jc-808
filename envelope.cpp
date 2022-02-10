@@ -6,49 +6,36 @@ using std::endl;
 
 Envelope::Envelope(Settings *settings)
 {
-    mAttackDuration = settings->attackDuration;
-    mDecayDuration = settings->decayDuration;
-    mReleaseDuration = settings->releaseDuration;
-    mSustainDuration = settings->sustainDuration;
-    mSustainAmplitude = settings->sustainAmplitude;
+    mAttack = settings->attack;
+    mDecay = settings->decay;
+    mSustain = settings->sustain;
+    mRelease = settings->release;
+    mDuration = mAttack + mDecay + mSustain + mRelease;
 
-    mTriggerAmplitude = 1.0;
+    mSustainAmp = settings->sustainAmp;
 }
 
-double Envelope::getAmplitude(double elapsed)
+double Envelope::getAmplitude(double time)
 {
-    if (elapsed < 0.001) return 0.0;
+    if (time > mDuration) return 0.0;
 
-    double amplitude = 0.0;
-
-    if (elapsed <= mAttackDuration) {
-        amplitude = mTriggerAmplitude / mAttackDuration * elapsed;
+    double amp = 0.0;
+    if (time <= mAttack) {
+        amp = (mPeakAmp / mAttack) * time;
+    } else if (time > mAttack && time <= mAttack + mDecay) {
+        amp = ((mSustainAmp - mPeakAmp) / mDecay) * (time - mAttack) + mPeakAmp;
+    } else if (time > mAttack + mDecay && time <= mDuration - mRelease) {
+        amp = mSustainAmp;
+    } else {
+        amp = -(mSustainAmp / mRelease) * (time - (mAttack + mDecay + mSustain)) + mSustainAmp;
     }
 
-    if (elapsed > mAttackDuration && elapsed <= mDecayDuration) {
-        amplitude =
-            (mSustainAmplitude - mTriggerAmplitude) /
-            (mDecayDuration) * (elapsed - mAttackDuration);
-    }
+    if (amp <= 0.001) amp = 0.0;
 
-    if (
-        elapsed > (mDecayDuration + mAttackDuration) &&
-        elapsed <= mSustainDuration
-    ) {
-        amplitude = mSustainAmplitude;
-    }
-
-    if (elapsed > mSustainDuration) {
-        amplitude =
-            (0 - mSustainAmplitude) / mReleaseDuration * elapsed + mSustainAmplitude;
-    }
-
-    if (amplitude <= 0.0001) amplitude = 0.0;
-
-    return amplitude;
+    return amp;
 }
 
 double Envelope::getDuration()
 {
-    return mAttackDuration + mDecayDuration + mSustainDuration + mReleaseDuration;
+    return mDuration;
 }
