@@ -5,18 +5,19 @@ using std::cout;
 using std::endl;
 
 const double gTempo = 80.0; // BPM = 2 beats per second
-const double gSeqSubdivision = 8; // for 8th notes, bump to 16
-const double gTempoStep = 1000.0 / (gTempo / 2) * gSeqSubdivision;
+const double gTempoStep = 60000.0 / (gTempo * 2.0);
 const double gTempoStepMs = gTempoStep / 1000.0;
 
 const double GAIN = 30000.0;
 
-double getRandNoise(double time);
-
-AudioEngine::AudioEngine()
+AudioEngine::AudioEngine(Sequencer *seq)
 {
-    mKick = nullptr;
-    mSnare = nullptr;
+    mSeq = seq;
+    cout << "Seq len " << seq->size() << endl;
+    mSeqPos = 0;
+    mPlaying = false;
+
+    mTime = 0.0;
 
     SDL_AudioSpec desiredSpec;
     desiredSpec.freq = mSampleRate;
@@ -36,37 +37,33 @@ AudioEngine::AudioEngine()
     if (mDeviceId == 0) {
         cout << "Failed to open audio device! Error: " << SDL_GetError() << endl;
     }
-
-    mTime = 0.0;
 }
 
 AudioEngine::~AudioEngine()
 {
-    mKick = nullptr;
-    mSnare = nullptr;
+    delete [] mSeq;
+    mSeq = nullptr;
     SDL_CloseAudioDevice(mDeviceId);
 }
 
 void AudioEngine::start()
 {
+    mPlaying = true;
+    mSeqPos = 0;
+    mTime = 0.0;
     SDL_PauseAudioDevice(mDeviceId, SDL_FALSE);
-}
-
-void AudioEngine::playKick(Kick *kick)
-{
-    mKick = kick;
-}
-
-void AudioEngine::playSnare(Snare *snare)
-{
-    mSnare = snare;
 }
 
 void AudioEngine::stop()
 {
-    mTime = 0.0;
+    mPlaying = false;
     SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
 
+}
+
+bool AudioEngine::isPlaying()
+{
+    return mPlaying;
 }
 
 SDL_AudioDeviceID AudioEngine::getAudioDevice()
@@ -84,21 +81,36 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
 {
     short *out = (short *)stream;
     for (int i = 0; i < (len / sizeof(short)); i++) {
-        if (mKick == nullptr && mSnare == nullptr) {
-            out[i] = 0.0;
-        } else {
-            double output = 0.0;
-            if (mKick != nullptr && mKick->isTriggered()) {
-                mKick->updateBy(mTimeStep);
-                output += mKick->getSample();
-                if (!mKick->isTriggered()) mKick = nullptr;
-            } else if (mSnare != nullptr && mSnare->isTriggered()) {
-                mSnare->updateBy(mTimeStep);
-                output += 0.5 * mSnare->getSample();
-                if (!mSnare->isTriggered()) mKick = nullptr;
+        if (mSeqPos >= 8) mSeqPos = 0;
+
+        Instrument *inst = (*mSeq)[mSeqPos];
+        if (inst != nullptr && !inst->isTriggered()) {
+            inst->trigger();
+            mActiveSamples.push_back(inst);
+        }
+
+        double output = 0.0;
+        for (auto sample : mActiveSamples) {
+            if (sample->isPlaying()) {
+                output += sample->getSample();
+                sample->updateBy(mTimeStep);
             }
-            out[i] = GAIN * output;
-            mTime += mTimeStep;
+        }
+        out[i] = GAIN * output;
+
+        for (auto it = mActiveSamples.begin(); it != mActiveSamples.end(); it++) {
+            Instrument *s = *it;
+            if (!s->isPlaying()) {
+                s->release();
+                mActiveSamples.erase(it);
+                it--;
+            }
+        }
+
+        mTime += mTimeStep;
+        if (mTime > gTempoStepMs) {
+            mTime = 0.0;
+            mSeqPos++;
         }
     }
 }

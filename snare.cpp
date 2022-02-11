@@ -23,5 +23,10 @@ double Snare::getSample()
     }
     double noiseEnv = -1 / mDuration * mElapsed + 1.0;
     double noise = noiseEnv * (double)rand() / RAND_MAX;
-    return 0.25 * tone +  0.4 * noise;
+    return 0.2 * (0.25 * tone +  0.3 * noise);
+}
+
+std::string Snare::getName()
+{
+    return mName;
 }

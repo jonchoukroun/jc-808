@@ -10,8 +10,12 @@ public:
 
     double getSample() override;
 
+    std::string getName() override;
+
 private:
     const double mToneDecay = 0.25;
+
+    const std::string mName = "Snare";
 };
 
 #endif

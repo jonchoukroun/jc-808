@@ -1,14 +1,20 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
+#include <string>
+
 class Instrument
 {
 public:
     Instrument(int frequency, double duration);
     ~Instrument();
 
+    virtual std::string getName();
+
     void trigger();
+    void release();
     bool isTriggered();
+    bool isPlaying();
 
     void updateBy(double time);
 
@@ -20,7 +26,9 @@ protected:
     int mFreq;
     double mDuration;
     double mElapsed;
+
     bool mTriggered;
+    bool mPlaying;
 };
 
 #endif

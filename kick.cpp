@@ -9,3 +9,8 @@ Kick::Kick(int frequency, double duration)
     mElapsed = 0.0;
     mTriggered = false;
 }
+
+std::string Kick::getName()
+{
+    return mName;
+}

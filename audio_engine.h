@@ -1,27 +1,34 @@
 #ifndef AUDIO_ENGINE_H
 #define AUDIO_ENGINE_H
 
+#include <array>
 #include <SDL2/SDL.h>
+#include <vector>
 #include "kick.h"
 #include "snare.h"
+
+using std::array;
+using std::vector;
+using Sequencer = array<Instrument *, 8>;
 
 class AudioEngine
 {
 public:
-    AudioEngine();
+    AudioEngine(Sequencer *seq);
     ~AudioEngine();
 
     void start();
     void stop();
-
-    void playKick(Kick *kick);
-    void playSnare(Snare *snare);
+    bool isPlaying();
 
     SDL_AudioDeviceID getAudioDevice();
 
 private:
-    Kick *mKick;
-    Snare *mSnare;
+    Sequencer *mSeq;
+    int mSeqPos;
+    bool mPlaying;
+
+    vector<Instrument *> mActiveSamples;
 
     static const int mSampleRate = 44100;
     static const int mSampleSize = 512;

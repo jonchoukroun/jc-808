@@ -1,6 +1,5 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include <vector>
 #include "audio_engine.h"
 #include "kick.h"
 #include "snare.h"
@@ -8,7 +7,6 @@
 
 using std::cout;
 using std::endl;
-using std::vector;
 
 static const int SCREEN_WIDTH = 640;
 static const int SCREEN_HEIGHT = 480;
@@ -23,6 +21,8 @@ bool init();
 
 void close();
 
+void setSeq(Sequencer *);
+
 int main(int argc, char *args[])
 {
     if (!init()) return -1;
@@ -31,13 +31,14 @@ int main(int argc, char *args[])
     SDL_Event e;
     Timer fpsTimer;
 
-    AudioEngine *engine = new AudioEngine();
-    Kick *kick = new Kick();
-    Snare *snare = new Snare();
+
+    Sequencer seq {nullptr};
+    setSeq(&seq);
+
+    AudioEngine *engine = new AudioEngine(&seq);
 
     while (!quit) {
         fpsTimer.start();
-        engine->start();
 
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_KEYDOWN) {
@@ -46,14 +47,19 @@ int main(int argc, char *args[])
                         quit = true;
                         break;
 
-                    case SDLK_1:
-                        kick->trigger();
-                        engine->playKick(kick);
+                    case SDLK_SPACE:
+                        if (engine->isPlaying()) {
+                            engine->stop();
+                        } else {
+                            engine->start();
+                        }
                         break;
 
-                    case SDLK_2:
-                        snare->trigger();
-                        engine->playSnare(snare);
+                    case SDLK_d:
+                        cout << "Debugging" << endl;
+                        for (auto note : seq) {
+                            cout << (note == nullptr ? "*" : note->getName()) << endl;
+                        }
                         break;
 
                     default:
@@ -102,4 +108,31 @@ bool init()
 void close()
 {
     SDL_Quit();
+}
+
+void setSeq(Sequencer *seq)
+{
+    /**
+     * 0 K
+     * 1 K
+     * 2 S
+     * 3 -
+     * 4 -
+     * 5 K
+     * 6 S
+     * 7 -
+     **/
+    for (int i = 0; i < seq->size(); i++) {
+        switch (i) {
+            case 0:
+            case 5:
+                (*seq)[i] = new Kick();
+                break;
+            case 2:
+            case 6:
+                (*seq)[i] = new Snare();
+                break;
+            default: break;
+        }
+    }
 }
