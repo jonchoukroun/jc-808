@@ -1,6 +1,7 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
+#include <cmath>
 #include <string>
 
 class Instrument

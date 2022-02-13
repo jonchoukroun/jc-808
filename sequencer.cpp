@@ -1,107 +1,141 @@
 #include <iostream>
-#include <sstream>
+#include "kick.h"
 #include "sequencer.h"
-#include "timer.h"
+#include "snare.h"
+
+#define MS_PER_MINUTE 60000.0
 
 using std::cout;
 using std::endl;
-using std::stringstream;
-using std::vector;
 
-const double MS_PER_MINUTE = 60000.0;
+void setSeq(Sequencer *seq);
 
 Sequencer::Sequencer()
 {
-    vector<unsigned char> empty(mNotesPerBeat, '-');
-    vector<vector<unsigned char>> seq(mBeatCount, empty);
+    array<vector<Instrument *>, SUBDIVISION> seq;
+    for (int i = 0; i < SUBDIVISION; i++) {
+        vector<Instrument *> v;
+        seq[i] = v;
+    }
     mSeq = seq;
 
-    mCurrentBeat = 0;
-    mIsPlaying = false;
+    vector<Instrument *> samples;
+    mActiveSamples = samples;
 
-    mTempo = 0;
-    mBeatDuration = 0.0;
+    mPlaying = false;
+
+    mTempo = 0.0;
+    mTempoStep = 0.0;
+    mElapsed = 0.0;
+
+    mPos = 0;
+
+    setSeq(this);
 }
 
-void Sequencer::setTempo(int tempo)
+Sequencer::~Sequencer() {}
+
+void Sequencer::setTempo(double tempo)
 {
     mTempo = tempo;
-    mBeatDuration = MS_PER_MINUTE / mTempo;
+    mTempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
+    cout << "tempo " << mTempo << endl;
+    cout << "step " << mTempoStep << endl;
 }
 
-bool Sequencer::addNote(unsigned char note, int beat)
+void Sequencer::setNote(Instrument *inst, int pos)
 {
-    if (beat > mSeq.size()) return false;
-
-    vector<unsigned char> notes = mSeq.at(beat);
-    switch (note) {
-        case 'K':
-            notes.at(0) = 'K';
-            break;
-        case 'S':
-            notes.at(1) = 'S';
-            break;
-        case 'H':
-            notes.at(2) = 'H';
-            break;
+    if (pos >= SUBDIVISION) {
+        cout << "Invalid note position" << endl;
+        return;
     }
-    mSeq.at(beat) = notes;
-
-    return true;
+    mSeq[pos].push_back(inst);
 }
 
-void Sequencer::play()
+void Sequencer::start()
 {
-    mIsPlaying = true;
-    Timer timer;
-    while (mCurrentBeat < mBeatCount) {
-        timer.start();
-        vector<unsigned char> notes = mSeq.at(mCurrentBeat);
-        for (unsigned char n : notes) {
-            cout << n << "\t";
+    // TODO: error handling UI
+    if (mTempo == 0.0) return;
+
+    vector<Instrument *> notes = mSeq[mPos];
+    for (auto n : notes) {
+        if (n == nullptr) {
+            cout << "Undefined instrument" << endl;
+            continue;
         }
-        cout << endl;
-        if (timer.getTicks() < mBeatDuration) {
-            SDL_Delay(mBeatDuration - timer.getTicks());
-        }
-        mCurrentBeat++;
+        n->trigger();
+        mActiveSamples.push_back(n);
     }
-    if (timer.isRunning()) timer.stop();
+
+    mPlaying = true;
 }
 
-void Sequencer::pause()
+void Sequencer::stop()
 {
-    cout << "Pausing" << endl;
-    mIsPlaying = false;
+    mPlaying = false;
+    mElapsed = 0.0;
+    mPos = 0;
+    mActiveSamples.clear();
 }
 
-void Sequencer::rewind()
+void Sequencer::updateBy(double time)
 {
-    cout << "Rewinding" << endl;
-    if (mIsPlaying) mIsPlaying = false;
-    mCurrentBeat = 0;
-}
+    if (mElapsed > mTempoStep) {
+        mElapsed = 0.0;
 
-bool Sequencer::isPlaying()
-{
-    return mIsPlaying;
-}
+        mPos++;
+        if (mPos >= SUBDIVISION) mPos = 0;
 
-// Debug Methods
-void Sequencer::printNotes()
-{
-    for (vector<unsigned char> notes : mSeq) {
-        for (unsigned char note : notes) {
-            cout << note << "\t";
+        vector<Instrument *> notes = mSeq[mPos];
+        for (auto i : notes) {
+            i->trigger();
+            mActiveSamples.push_back(i);
         }
-        cout << endl;
+    } else {
+        for (auto s = mActiveSamples.begin(); s != mActiveSamples.end(); s++) {
+            Instrument *i = *s;
+            i->updateBy(time);
+            if (!i->isPlaying()){
+                i->release();
+                mActiveSamples.erase(s);
+                s--;
+            }
+        }
     }
+
+    mElapsed += time;
 }
 
-void Sequencer::printValues()
+vector<Instrument *> Sequencer::getActiveSamples()
 {
-    cout << "mCurrentBeat = " << mCurrentBeat << endl;
-    cout << "mIsPlaying = " << (mIsPlaying ? "true" : "false") << endl;
-    cout << "mTempo = " << mTempo << endl;
-    cout << "mBeatDuration = " << mBeatDuration << endl;
+    return mActiveSamples;
+}
+
+void setSeq(Sequencer *seq)
+{
+    /**
+     * 0 K
+     * 1 -
+     * 2 K
+     * 3 -
+     * 4 S
+     * 5 -
+     * 6 -
+     * 7 -
+     * 8 K
+     * 9 -
+     * 10 -
+     * 11 -
+     * 12 S
+     * 13 -
+     * 14 K
+     * 15 -
+     **/
+    seq->setNote(new Kick(), 0);
+    seq->setNote(new Kick(), 3);
+    seq->setNote(new Snare(), 4);
+    seq->setNote(new Kick(), 5);
+    seq->setNote(new Kick(), 7);
+    seq->setNote(new Kick(), 11);
+    seq->setNote(new Snare(), 12);
 }

@@ -4,21 +4,10 @@
 using std::cout;
 using std::endl;
 
-const double gTempo = 80.0; // BPM = 2 beats per second
-const double gTempoStep = 60000.0 / (gTempo * 2.0);
-const double gTempoStepMs = gTempoStep / 1000.0;
-
 const double GAIN = 30000.0;
 
 AudioEngine::AudioEngine(Sequencer *seq)
 {
-    mSeq = seq;
-    cout << "Seq len " << seq->size() << endl;
-    mSeqPos = 0;
-    mPlaying = false;
-
-    mTime = 0.0;
-
     SDL_AudioSpec desiredSpec;
     desiredSpec.freq = mSampleRate;
     desiredSpec.format = AUDIO_S16;
@@ -37,6 +26,10 @@ AudioEngine::AudioEngine(Sequencer *seq)
     if (mDeviceId == 0) {
         cout << "Failed to open audio device! Error: " << SDL_GetError() << endl;
     }
+
+    mPlaying = false;
+
+    mSeq = seq;
 }
 
 AudioEngine::~AudioEngine()
@@ -48,14 +41,16 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::start()
 {
+    if (mSeq == nullptr) return;
+
+    mSeq->start();
     mPlaying = true;
-    mSeqPos = 0;
-    mTime = 0.0;
     SDL_PauseAudioDevice(mDeviceId, SDL_FALSE);
 }
 
 void AudioEngine::stop()
 {
+    mSeq->stop();
     mPlaying = false;
     SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
 
@@ -81,37 +76,17 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
 {
     short *out = (short *)stream;
     for (int i = 0; i < (len / sizeof(short)); i++) {
-        if (mSeqPos >= 8) mSeqPos = 0;
-
-        Instrument *inst = (*mSeq)[mSeqPos];
-        if (inst != nullptr && !inst->isTriggered()) {
-            inst->trigger();
-            mActiveSamples.push_back(inst);
-        }
-
         double output = 0.0;
-        for (auto sample : mActiveSamples) {
-            if (sample->isPlaying()) {
-                output += sample->getSample();
-                sample->updateBy(mTimeStep);
+
+        vector<Instrument *> notes = mSeq->getActiveSamples();
+        for (auto n : notes) {
+            if (n->isPlaying()) {
+                output += n->getSample();
             }
         }
         out[i] = GAIN * output;
 
-        for (auto it = mActiveSamples.begin(); it != mActiveSamples.end(); it++) {
-            Instrument *s = *it;
-            if (!s->isPlaying()) {
-                s->release();
-                mActiveSamples.erase(it);
-                it--;
-            }
-        }
-
-        mTime += mTimeStep;
-        if (mTime > gTempoStepMs) {
-            mTime = 0.0;
-            mSeqPos++;
-        }
+        mSeq->updateBy(mTimeStep);
     }
 }
 

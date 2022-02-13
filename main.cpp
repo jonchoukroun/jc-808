@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "audio_engine.h"
 #include "kick.h"
+#include "sequencer.h"
 #include "snare.h"
 #include "timer.h"
 
@@ -13,15 +14,12 @@ static const int SCREEN_HEIGHT = 480;
 
 static const double TICKS_PER_FRAME = 1000 / 60;
 
-
 SDL_Window *gWindow = nullptr;
 SDL_Renderer *gRenderer = nullptr;
 
 bool init();
 
 void close();
-
-void setSeq(Sequencer *);
 
 int main(int argc, char *args[])
 {
@@ -32,10 +30,9 @@ int main(int argc, char *args[])
     Timer fpsTimer;
 
 
-    Sequencer seq {nullptr};
-    setSeq(&seq);
-
-    AudioEngine *engine = new AudioEngine(&seq);
+    Sequencer sequencer;
+    sequencer.setTempo(90);
+    AudioEngine *engine = new AudioEngine(&sequencer);
 
     while (!quit) {
         fpsTimer.start();
@@ -55,12 +52,12 @@ int main(int argc, char *args[])
                         }
                         break;
 
-                    case SDLK_d:
-                        cout << "Debugging" << endl;
-                        for (auto note : seq) {
-                            cout << (note == nullptr ? "*" : note->getName()) << endl;
-                        }
-                        break;
+                    // case SDLK_d:
+                    //     cout << "Debugging" << endl;
+                    //     for (auto note : seq) {
+                    //         cout << (note == nullptr ? "*" : note->getName()) << endl;
+                    //     }
+                    //     break;
 
                     default:
                         break;
@@ -108,31 +105,4 @@ bool init()
 void close()
 {
     SDL_Quit();
-}
-
-void setSeq(Sequencer *seq)
-{
-    /**
-     * 0 K
-     * 1 K
-     * 2 S
-     * 3 -
-     * 4 -
-     * 5 K
-     * 6 S
-     * 7 -
-     **/
-    for (int i = 0; i < seq->size(); i++) {
-        switch (i) {
-            case 0:
-            case 5:
-                (*seq)[i] = new Kick();
-                break;
-            case 2:
-            case 6:
-                (*seq)[i] = new Snare();
-                break;
-            default: break;
-        }
-    }
 }

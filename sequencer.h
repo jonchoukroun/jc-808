@@ -2,7 +2,14 @@
 #define SEQUENCER_H
 
 #include <SDL2/SDL.h>
+#include <array>
 #include <vector>
+#include "instrument.h"
+
+#define SUBDIVISION 16
+
+using std::array;
+using std::vector;
 
 const int SAMPLE_RATE = 44100;
 
@@ -10,33 +17,32 @@ class Sequencer
 {
 public:
     Sequencer();
+    ~Sequencer();
 
-    void setTempo(int tempo);
+    void setTempo(double tempo);
 
-    bool addNote(unsigned char note, int beat);
+    void setNote(Instrument *inst, int pos);
 
-    void play();
-    void pause();
-    void rewind();
+    void start();
+    void stop();
+    void updateBy(double time);
+
+    vector<Instrument *> getActiveSamples();
 
     bool isPlaying();
 
-    // Debug methods
-    void printNotes();
-    void printValues();
-
 private:
-    static const int mBeatCount = 8;
-    static const int mNotesPerBeat = 3;
+    array<vector<Instrument *>, SUBDIVISION> mSeq;
 
-    int mCurrentBeat;
-    bool mIsPlaying;
+    vector<Instrument *> mActiveSamples;
 
-    // beats per minute
-    int mTempo;
-    double mBeatDuration;
+    bool mPlaying;
 
-    std::vector<std::vector<unsigned char>> mSeq;
+    double mTempo;
+    double mTempoStep;
+    double mElapsed;
+
+    int mPos;
 };
 
 #endif
