@@ -5,6 +5,7 @@ using std::cout;
 using std::endl;
 
 const double GAIN = 30000.0;
+const int MAX_INSTRUMENTS = 3;
 
 AudioEngine::AudioEngine(Sequencer *seq)
 {
@@ -84,7 +85,7 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
                 output += n->getSample();
             }
         }
-        out[i] = GAIN * output;
+        out[i] = GAIN * output / (double)MAX_INSTRUMENTS;
 
         mSeq->updateBy(mTimeStep);
     }
