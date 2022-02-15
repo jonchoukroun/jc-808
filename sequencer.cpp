@@ -115,27 +115,26 @@ void setSeq(Sequencer *seq)
 {
     /**
      * 0 K
-     * 1 -
-     * 2 K
+     * 1 K
+     * 2 -
      * 3 -
      * 4 S
      * 5 -
-     * 6 -
-     * 7 -
-     * 8 K
+     * 6 K
+     * 7 K
+     * 8 -
      * 9 -
      * 10 -
      * 11 -
      * 12 S
      * 13 -
-     * 14 K
+     * 14 -
      * 15 -
      **/
     seq->setNote(new Kick(), 0);
-    seq->setNote(new Kick(), 3);
+    seq->setNote(new Kick(), 1);
     seq->setNote(new Snare(), 4);
-    seq->setNote(new Kick(), 5);
+    seq->setNote(new Kick(), 6);
     seq->setNote(new Kick(), 7);
-    seq->setNote(new Kick(), 11);
     seq->setNote(new Snare(), 12);
 }
