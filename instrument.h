@@ -19,6 +19,8 @@ public:
 
     void updateBy(double time);
 
+    double getEnv();
+
     virtual double getSample();
 
     static constexpr double TAU = M_PI * 2.0;

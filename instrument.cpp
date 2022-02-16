@@ -45,11 +45,15 @@ void Instrument::updateBy(double time)
     }
 }
 
+double Instrument::getEnv()
+{
+    return -1 / mDuration * mElapsed + 1.0;
+}
+
 double Instrument::getSample()
 {
-    double env = -1 / mDuration * mElapsed + 1.0;
     double amp = sin(mFreq * TAU * mElapsed);
-    return env * amp;
+    return amp * getEnv();
 }
 
 std::string Instrument::getName()
