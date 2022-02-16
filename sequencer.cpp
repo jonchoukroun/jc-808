@@ -1,4 +1,5 @@
 #include <iostream>
+#include "closed_hat.h"
 #include "kick.h"
 #include "sequencer.h"
 #include "snare.h"
@@ -39,8 +40,6 @@ void Sequencer::setTempo(double tempo)
 {
     mTempo = tempo;
     mTempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
-    cout << "tempo " << mTempo << endl;
-    cout << "step " << mTempoStep << endl;
 }
 
 void Sequencer::setNote(Instrument *inst, int pos)
@@ -131,10 +130,16 @@ void setSeq(Sequencer *seq)
      * 14 -
      * 15 -
      **/
+    for (int i = 0; i < 16; i++) {
+        if (i % 2 == 0) {
+            seq->setNote(new ClosedHat(), i);
+        }
+    }
     seq->setNote(new Kick(), 0);
     seq->setNote(new Kick(), 1);
     seq->setNote(new Snare(), 4);
-    seq->setNote(new Kick(), 6);
     seq->setNote(new Kick(), 7);
     seq->setNote(new Snare(), 12);
+    seq->setNote(new ClosedHat(), 13);
+    seq->setNote(new ClosedHat(), 14);
 }
