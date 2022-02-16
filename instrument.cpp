@@ -54,5 +54,5 @@ double Instrument::getSample()
 
 std::string Instrument::getName()
 {
-    return "";
+    return "-";
 }
