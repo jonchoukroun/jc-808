@@ -21,8 +21,7 @@ double Snare::getSample()
         double toneEnv = (0 - 1) / mToneDecay * mElapsed + 1.0;
         tone = toneEnv * sin(mFreq * TAU * mElapsed);
     }
-    double noiseEnv = -1 / mDuration * mElapsed + 1.0;
-    double noise = noiseEnv * (double)rand() / RAND_MAX;
+    double noise = getEnv() * (double)rand() / RAND_MAX;
     return 0.2 * (0.25 * tone +  0.3 * noise);
 }
 
