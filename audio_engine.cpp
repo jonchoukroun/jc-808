@@ -5,7 +5,7 @@ using std::cout;
 using std::endl;
 
 const double GAIN = 30000.0;
-const int MAX_INSTRUMENTS = 3;
+const int MAX_INSTRUMENTS = 4;
 
 AudioEngine::AudioEngine(Sequencer *seq)
 {
