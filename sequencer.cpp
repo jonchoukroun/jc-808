@@ -1,4 +1,5 @@
 #include <iostream>
+#include "clap.h"
 #include "closed_hat.h"
 #include "kick.h"
 #include "sequencer.h"
@@ -113,33 +114,29 @@ vector<Instrument *> Sequencer::getActiveSamples()
 void setSeq(Sequencer *seq)
 {
     /**
-     * 0 K
-     * 1 K
-     * 2 -
-     * 3 -
-     * 4 S
-     * 5 -
-     * 6 K
-     * 7 K
-     * 8 -
-     * 9 -
-     * 10 -
-     * 11 -
-     * 12 S
-     * 13 -
-     * 14 -
-     * 15 -
+     *  0 1
+     *  1 e
+     *  2 +
+     *  3 a
+     *  4 2
+     *  5 e
+     *  6 +
+     *  7 a
+     *  8 3
+     *  9 e
+     * 10 +
+     * 11 a
+     * 12 4
+     * 13 e
+     * 14 +
+     * 15 a
      **/
     for (int i = 0; i < 16; i++) {
-        if (i % 2 == 0) {
-            seq->setNote(new ClosedHat(), i);
-        }
+        seq->setNote(new ClosedHat(), i);
     }
     seq->setNote(new Kick(), 0);
-    seq->setNote(new Kick(), 1);
-    seq->setNote(new Snare(), 4);
+    seq->setNote(new Clap(), 4);
     seq->setNote(new Kick(), 7);
-    seq->setNote(new Snare(), 12);
-    seq->setNote(new ClosedHat(), 13);
-    seq->setNote(new ClosedHat(), 14);
+    seq->setNote(new Kick(), 8);
+    seq->setNote(new Clap(), 12);
 }

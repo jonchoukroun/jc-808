@@ -2,6 +2,7 @@
 #define INSTRUMENT_H
 
 #include <cmath>
+#include <optional>
 #include <string>
 
 class Instrument
@@ -19,7 +20,7 @@ public:
 
     void updateBy(double time);
 
-    double getEnv();
+    double getEnv(std::optional<double> time = std::nullopt);
 
     virtual double getSample();
 

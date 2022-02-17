@@ -45,9 +45,12 @@ void Instrument::updateBy(double time)
     }
 }
 
-double Instrument::getEnv()
+double Instrument::getEnv(std::optional<double> time)
 {
-    return -1 / mDuration * mElapsed + 1.0;
+    if (time == std::nullopt) {
+        return -1 / mDuration * mElapsed + 1.0;
+    }
+    return -1 / mDuration * (*time) + 1.0;
 }
 
 double Instrument::getSample()
