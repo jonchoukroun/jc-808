@@ -132,11 +132,13 @@ void setSeq(Sequencer *seq)
      * 15 a
      **/
     for (int i = 0; i < 16; i++) {
-        seq->setNote(new ClosedHat(), i);
+        if (i % 2 == 0)
+            seq->setNote(new ClosedHat(), i);
     }
     seq->setNote(new Kick(), 0);
+    // seq->setNote(new Snare(), 4);
     seq->setNote(new Clap(), 4);
-    seq->setNote(new Kick(), 7);
     seq->setNote(new Kick(), 8);
+    // seq->setNote(new Snare(), 12);
     seq->setNote(new Clap(), 12);
 }

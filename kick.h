@@ -6,7 +6,12 @@
 class Kick : public Instrument
 {
 public:
-    Kick(int frequency = 47, double duration = 0.35);
+    Kick(Envelope env = {
+        .frequency = 47,
+        .volume = 0.8,
+        .attack = 0.002,
+        .release = 0.25,
+    });
 
     std::string getName() override;
 

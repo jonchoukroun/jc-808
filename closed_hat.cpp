@@ -4,16 +4,14 @@
 using std::cout;
 using std::endl;
 
-ClosedHat::ClosedHat(int frequency)
-: Instrument(frequency, 0.27)
+ClosedHat::ClosedHat(Envelope env) : Instrument(env)
 {
-    mFreq = frequency;
-    mHarmonics[0] = mFreq * 2.0;
-    mHarmonics[1] = mFreq * 3.0;
-    mHarmonics[2] = mFreq * 4.16;
-    mHarmonics[3] = mFreq * 5.43;
-    mHarmonics[4] = mFreq * 6.79;
-    mHarmonics[5] = mFreq * 8.21;
+    mHarmonics[0] = env.frequency * 2.0;
+    mHarmonics[1] = env.frequency * 3.0;
+    mHarmonics[2] = env.frequency * 4.16;
+    mHarmonics[3] = env.frequency * 5.43;
+    mHarmonics[4] = env.frequency * 6.79;
+    mHarmonics[5] = env.frequency * 8.21;
 
     mBandPass = new Filter(BANDPASS);
     mBandPass->setFilter(10000.0, 5.0);

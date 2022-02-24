@@ -8,7 +8,12 @@
 class ClosedHat : public Instrument
 {
 public:
-    ClosedHat(int frequency = 40);
+    ClosedHat(Envelope env = {
+        .frequency = 40,
+        .volume = 0.5,
+        .attack = 0.02,
+        .release = 0.3,
+    });
 
     double getSample() override;
 

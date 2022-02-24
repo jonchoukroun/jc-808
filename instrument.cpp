@@ -2,10 +2,10 @@
 #include <iostream>
 #include "instrument.h"
 
-Instrument::Instrument(int frequency, double duration)
+Instrument::Instrument(Envelope env)
 {
-    mFreq = frequency;
-    mDuration = duration;
+    mEnv = env;
+    mDuration = env.attack + env.release;
     mElapsed = 0.0;
     mTriggered = false;
 }
@@ -45,18 +45,22 @@ void Instrument::updateBy(double time)
     }
 }
 
-double Instrument::getEnv(std::optional<double> time)
+double Instrument::getEnv()
 {
-    if (time == std::nullopt) {
-        return -1 / mDuration * mElapsed + 1.0;
+    if (mElapsed <= mEnv.attack) {
+        return mEnv.volume / mEnv.attack * mElapsed;
+    } else if (mElapsed < mEnv.attack + mEnv.release) {
+        return -mEnv.volume / mEnv.release * (mElapsed - mEnv.attack) + mEnv.volume;
+    } else {
+        return 0.0;
     }
-    return -1 / mDuration * (*time) + 1.0;
 }
 
 double Instrument::getSample()
 {
-    double amp = sin(mFreq * TAU * mElapsed);
-    return amp * getEnv();
+    double amp = sin(mEnv.frequency * TAU * mElapsed);
+    double env = getEnv();
+    return amp * env;
 }
 
 std::string Instrument::getName()

@@ -52,13 +52,6 @@ int main(int argc, char *args[])
                         }
                         break;
 
-                    // case SDLK_d:
-                    //     cout << "Debugging" << endl;
-                    //     for (auto note : seq) {
-                    //         cout << (note == nullptr ? "*" : note->getName()) << endl;
-                    //     }
-                    //     break;
-
                     default:
                         break;
                 }

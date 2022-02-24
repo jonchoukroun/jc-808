@@ -1,11 +1,8 @@
 #include <cmath>
 #include "kick.h"
 
-Kick::Kick(int frequency, double duration)
-: Instrument(frequency, duration)
+Kick::Kick(Envelope env) : Instrument(env)
 {
-    mFreq = frequency;
-    mDuration = duration;
     mElapsed = 0.0;
     mTriggered = false;
 }

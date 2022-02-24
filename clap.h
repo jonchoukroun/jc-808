@@ -7,7 +7,12 @@
 class Clap : public Instrument
 {
 public:
-    Clap(int frequency = 180, double duration = 0.2);
+    Clap(Envelope env = {
+        .frequency = 200,
+        .volume = 0.8,
+        .attack = 0.01,
+        .release = 0.25
+    });
 
     double getSample() override;
 

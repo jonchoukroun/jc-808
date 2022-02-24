@@ -8,7 +8,14 @@
 class Instrument
 {
 public:
-    Instrument(int frequency, double duration);
+    struct Envelope {
+        int frequency;
+        double volume;
+        double attack;
+        double release;
+    };
+
+    Instrument(Envelope env);
     ~Instrument();
 
     virtual std::string getName();
@@ -20,14 +27,14 @@ public:
 
     void updateBy(double time);
 
-    double getEnv(std::optional<double> time = std::nullopt);
+    double getEnv();
 
     virtual double getSample();
 
     static constexpr double TAU = M_PI * 2.0;
 
 protected:
-    int mFreq;
+    Envelope mEnv;
     double mDuration;
     double mElapsed;
 

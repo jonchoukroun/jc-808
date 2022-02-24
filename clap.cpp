@@ -2,11 +2,8 @@
 #include <cmath>
 #include "clap.h"
 
-Clap::Clap(int frequency, double duration)
-: Instrument(frequency, duration)
+Clap::Clap(Envelope env) : Instrument(env)
 {
-    mFreq = frequency;
-    mDuration = duration + 2 * mInterval;
     mElapsed = 0.0;
     mTriggered = false;
 
