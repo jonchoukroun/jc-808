@@ -84,7 +84,7 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
                 output += n->getSample();
             }
         }
-        out[i] = GAIN * output;
+        out[i] = 0.8 * GAIN * output;
 
         mSeq->updateBy(mTimeStep);
     }
