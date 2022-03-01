@@ -4,18 +4,12 @@
 #include <cmath>
 #include <optional>
 #include <string>
+#include "envelope.h"
 
 class Instrument
 {
 public:
-    struct Envelope {
-        int frequency;
-        double volume;
-        double attack;
-        double release;
-    };
-
-    Instrument(Envelope env);
+    Instrument(int freq, Envelope env);
     ~Instrument();
 
     virtual std::string getName();
@@ -27,14 +21,14 @@ public:
 
     void updateBy(double time);
 
-    double getEnv();
-
     virtual double getSample();
 
     static constexpr double TAU = M_PI * 2.0;
 
 protected:
+    int mFreq;
     Envelope mEnv;
+
     double mDuration;
     double mElapsed;
 

@@ -7,12 +7,7 @@
 class Clap : public Instrument
 {
 public:
-    Clap(Envelope env = {
-        .frequency = 200,
-        .volume = 0.8,
-        .attack = 0.01,
-        .release = 0.25
-    });
+    Clap(double decay = 0.25);
 
     double getSample() override;
 
@@ -21,10 +16,10 @@ public:
 private:
     const std::string mName = "Clap";
 
+    static const int mDefaultFreq = 200;
+
     // 10 ms between claps
     static constexpr double mInterval = 0.01;
-
-    double mSingleDuration;
 
     Filter *mHighPass;
     Filter *mBandPass;

@@ -1,7 +1,8 @@
 #include <cmath>
 #include "kick.h"
 
-Kick::Kick(Envelope env) : Instrument(env)
+Kick::Kick(double amp, double decay)
+: Instrument(mDefaultFreq, { amp, 0.002, decay })
 {
     mElapsed = 0.0;
     mTriggered = false;

@@ -6,17 +6,14 @@
 class Kick : public Instrument
 {
 public:
-    Kick(Envelope env = {
-        .frequency = 47,
-        .volume = 0.8,
-        .attack = 0.002,
-        .release = 0.25,
-    });
+    Kick(double amp = 0.8, double decay = 0.2);
 
     std::string getName() override;
 
 private:
     const std::string mName = "Kick";
+
+    static const int mDefaultFreq = 47;
 };
 
 #endif

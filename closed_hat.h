@@ -8,12 +8,7 @@
 class ClosedHat : public Instrument
 {
 public:
-    ClosedHat(Envelope env = {
-        .frequency = 40,
-        .volume = 0.5,
-        .attack = 0.02,
-        .release = 0.3,
-    });
+    ClosedHat();
 
     double getSample() override;
 
@@ -21,6 +16,8 @@ public:
 
 private:
     const std::string mName = "Closed Hi-Hat";
+
+    static const int mBaseFreq = 40;
 
     static constexpr double mDuration = 0.27;
 

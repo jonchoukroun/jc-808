@@ -3,39 +3,28 @@
 #include <ctime>
 #include "snare.h"
 
-Snare::Snare(Envelope env, double snappy)
-: Instrument(env)
+Snare::Snare(double amp, double decay, double snappy)
+: Instrument(mDefaultFreq, { amp, 0.001, decay }), mNoiseEnv({ snappy, 0.01, 0.4})
 {
-    mSnappy = snappy;
     mElapsed = 0.0;
     mTriggered = false;
 
     mHighPass = new Filter(HIGHPASS);
-    mHighPass->setFilter(600, 5.0);
+    mHighPass->setFilter(400, 5.0);
     mBandPass = new Filter(BANDPASS);
-    mBandPass->setFilter(2000, 3.0);
+    mBandPass->setFilter(1000, 1.0);
 
     srand(time(0));
 }
 
 double Snare::getSample()
 {
-    double tone = sin(TAU * mEnv.frequency * mElapsed);
-    double noise = (double)rand() / RAND_MAX;
-    if (mElapsed <= mEnv.attack) {
-        tone *= mEnv.volume / mEnv.attack * mElapsed;
-        noise *= mSnappy / mEnv.attack * mElapsed;
-    } else if (mElapsed <= mEnv.attack + mEnv.release) {
-        tone *= -mEnv.volume / mEnv.release * (mElapsed - mEnv.attack) + mEnv.volume;
-        noise *= -mSnappy / mEnv.release * (mElapsed - mEnv.attack) + mSnappy;
-    } else {
-        tone *= 0.0;
-        noise *= 0.0;
-    }
+    double tone = sin(TAU * mFreq * mElapsed) * mEnv.getAmplitude(mElapsed);
+    double filteredNoise = mBandPass->filter((double)rand() / RAND_MAX);
+    filteredNoise *= mNoiseEnv.getAmplitude(mElapsed);
 
-    double blend = 0.5 * (tone  + noise);
-    double filtered = mBandPass->filter(blend);
-    return mHighPass->filter(filtered);
+    double blend = 0.5 * (tone + filteredNoise);
+    return mHighPass->filter(blend);
 }
 
 std::string Snare::getName()

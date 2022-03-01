@@ -2,7 +2,8 @@
 #include <cmath>
 #include "clap.h"
 
-Clap::Clap(Envelope env) : Instrument(env)
+Clap::Clap(double decay)
+: Instrument(mDefaultFreq, { 0.8, 0.01, decay, true })
 {
     mElapsed = 0.0;
     mTriggered = false;
@@ -28,6 +29,7 @@ double Clap::getSample()
         }
         sample *= noise * (2.0 / M_PI);
     } else {
+        // TODO: replace with exponential Envelope decay
         double decay = amp * pow(mDuration * 0.001, mElapsed);
         sample = noise * decay;
     }
