@@ -136,13 +136,10 @@ void setSeq(Sequencer *seq)
             seq->setNote(new ClosedHat(), i);
     }
     seq->setNote(new Kick(), 0);
-    seq->setNote(new Clap(), 4);
-    seq->setNote(new Kick({
-        .frequency = 47,
-        .volume = 0.4,
-        .attack = 0.002,
-        .release = 0.25
-    }), 7);
+    seq->setNote(new Snare(), 4);
+    // seq->setNote(new Clap(), 4);
+    seq->setNote(new Kick(0.4), 7);
     seq->setNote(new Kick(), 8);
+    // seq->setNote(new Snare(), 12);
     seq->setNote(new Clap(), 12);
 }
