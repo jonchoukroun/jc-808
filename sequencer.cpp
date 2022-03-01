@@ -131,15 +131,27 @@ void setSeq(Sequencer *seq)
      * 14 +
      * 15 a
      **/
+    ClosedHat *hatBeat = new ClosedHat(0.7);
+    ClosedHat *hatOffBeat = new ClosedHat(0.4);
+
+    Kick *kick = new Kick(0.8, 0.15);
+    Kick *kickOff = new Kick(0.4, 0.15);
+
+    Snare *snare = new Snare();
+    Clap *clap = new Clap();
+
     for (int i = 0; i < 16; i++) {
-        if (i % 2 == 0)
-            seq->setNote(new ClosedHat(), i);
+        if (i % 2 == 0) {
+            seq->setNote(hatBeat, i);
+        } else {
+            seq->setNote(hatOffBeat, i);
+        }
     }
-    seq->setNote(new Kick(), 0);
-    seq->setNote(new Snare(), 4);
+    seq->setNote(kick, 0);
+    seq->setNote(snare, 4);
     // seq->setNote(new Clap(), 4);
-    seq->setNote(new Kick(0.4), 7);
-    seq->setNote(new Kick(), 8);
+    seq->setNote(kickOff, 7);
+    seq->setNote(kick, 8);
     // seq->setNote(new Snare(), 12);
-    seq->setNote(new Clap(), 12);
+    seq->setNote(clap, 12);
 }
