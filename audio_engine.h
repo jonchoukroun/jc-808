@@ -25,7 +25,7 @@ public:
 
 private:
     static const int mSampleRate = 44100;
-    static const int mSampleSize = 2048;
+    static const int mSampleSize = 1024;
     static const int mChannels = 1;
 
     SDL_AudioDeviceID mDeviceId = 0;
