@@ -4,7 +4,7 @@
 using std::cout;
 using std::endl;
 
-ClosedHat::ClosedHat() : Instrument(mBaseFreq, { 0.5, .02, 0.3 })
+ClosedHat::ClosedHat(double amp) : Instrument(mBaseFreq, { amp, .02, 0.3 })
 {
     mHarmonics[0] = mBaseFreq * 2.0;
     mHarmonics[1] = mBaseFreq * 3.0;

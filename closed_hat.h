@@ -8,7 +8,7 @@
 class ClosedHat : public Instrument
 {
 public:
-    ClosedHat();
+    ClosedHat(double amp = 0.8);
 
     double getSample() override;
 
