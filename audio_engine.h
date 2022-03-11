@@ -4,9 +4,7 @@
 #include <array>
 #include <SDL2/SDL.h>
 #include <vector>
-#include "kick.h"
 #include "sequencer.h"
-#include "snare.h"
 
 using std::array;
 using std::vector;
