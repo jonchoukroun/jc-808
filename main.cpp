@@ -1,9 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "audio_engine.h"
-#include "kick.h"
 #include "sequencer.h"
-#include "snare.h"
 #include "timer.h"
 
 using std::cout;
