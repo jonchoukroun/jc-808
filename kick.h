@@ -6,9 +6,8 @@
 class Kick : public Instrument
 {
 public:
-    Kick(double amp = 0.8, double decay = 0.2);
-
-    std::string getName() override;
+    Kick();
+    ~Kick() = default;
 
 private:
     const std::string m_defaultName = "Kick";

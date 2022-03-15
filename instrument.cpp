@@ -2,16 +2,11 @@
 #include <iostream>
 #include "instrument.h"
 
-Instrument::Instrument(int freq, Envelope env)
-: mFreq(freq), mEnv(env)
+void Instrument::setEnvelope(Envelope *env)
 {
-    mDuration = mEnv.getDuration();
-    mElapsed = 0.0;
-    mTriggered = false;
-    mPlaying = false;
+    m_env = env;
+    m_duration = env->getDuration();
 }
-
-Instrument::~Instrument() {}
 
 void Instrument::trigger()
 {

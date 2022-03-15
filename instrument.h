@@ -9,10 +9,12 @@
 class Instrument
 {
 public:
-    Instrument(int freq, Envelope env);
-    ~Instrument();
+    Instrument() = default;
+    ~Instrument() = default;
 
-    virtual std::string getName();
+    void setEnvelope(Envelope *);
+
+    std::string getName();
 
     void trigger();
     void release();
