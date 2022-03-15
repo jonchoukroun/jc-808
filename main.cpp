@@ -29,8 +29,9 @@ int main(int argc, char *args[])
 
 
     Sequencer sequencer;
+    sequencer.init();
     sequencer.setTempo(90);
-    AudioEngine *engine = new AudioEngine(&sequencer);
+    AudioEngine engine{sequencer};
 
     while (!quit) {
         fpsTimer.start();
@@ -43,10 +44,10 @@ int main(int argc, char *args[])
                         break;
 
                     case SDLK_SPACE:
-                        if (engine->isPlaying()) {
-                            engine->stop();
+                        if (engine.isPlaying()) {
+                            engine.stop();
                         } else {
-                            engine->start();
+                            engine.start();
                         }
                         break;
 
@@ -64,7 +65,7 @@ int main(int argc, char *args[])
 
     if (fpsTimer.isRunning()) fpsTimer.stop();
 
-    engine->stop();
+    engine.stop();
 
     close();
 
