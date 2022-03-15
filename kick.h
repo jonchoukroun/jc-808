@@ -11,9 +11,8 @@ public:
     std::string getName() override;
 
 private:
-    const std::string mName = "Kick";
-
-    static const int mDefaultFreq = 47;
+    const std::string m_defaultName = "Kick";
+    const int m_defaultFreq = 247;
 };
 
 #endif

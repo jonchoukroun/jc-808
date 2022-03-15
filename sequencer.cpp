@@ -35,14 +35,14 @@ void Sequencer::init()
 }
 void Sequencer::setTempo(double tempo)
 {
-    mTempo = tempo;
-    mTempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
+    m_tempo = tempo;
+    m_tempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
 }
 
 void Sequencer::setNote(Instrument &inst, int pos)
 {
     cout << "Before" << endl;
-    for (auto &beat : mSeq) {
+    for (auto &beat : m_seq) {
         for (auto i : beat) {
             cout << "inst at " << &i << endl;
         }
@@ -52,9 +52,9 @@ void Sequencer::setNote(Instrument &inst, int pos)
         return;
     }
     cout << "Will push back " << inst.getName() << endl;
-    mSeq[pos].push_back(&inst);
+    m_seq[pos].push_back(&inst);
     cout << "After" << endl;
-    for (auto &beat : mSeq) {
+    for (auto &beat : m_seq) {
         for (auto i : beat) {
             cout << "inst at " << &i << endl;
         }
@@ -64,60 +64,61 @@ void Sequencer::setNote(Instrument &inst, int pos)
 void Sequencer::start()
 {
     // TODO: error handling UI
-    if (mTempo == 0.0) return;
+    if (m_tempo == 0.0) return;
 
-    vector<Instrument *> beat = mSeq.at(mPos);
+    vector<Instrument *> beat = m_seq.at(m_pos);
     for (auto &i : beat) {
         if (i == nullptr) {
             cout << "Undefined instrument" << endl;
             continue;
         }
+        cout << "start | will trigger " << i->getName() << endl;
         i->trigger();
-        mActiveSamples.push_back(i);
+        m_activeSamples.push_back(i);
     }
 
-    mPlaying = true;
+    m_playing = true;
 }
 
 void Sequencer::stop()
 {
-    mPlaying = false;
-    mElapsed = 0.0;
-    mPos = 0;
-    mActiveSamples.clear();
+    m_playing = false;
+    m_elapsed = 0.0;
+    m_pos = 0;
+    m_activeSamples.clear();
 }
 
 void Sequencer::updateBy(double time)
 {
-    if (mElapsed > mTempoStep) {
-        mElapsed = 0.0;
+    if (m_elapsed > m_tempoStep) {
+        m_elapsed = 0.0;
 
-        mPos++;
-        if (mPos >= SUBDIVISION) mPos = 0;
+        m_pos++;
+        if (m_pos >= SUBDIVISION) m_pos = 0;
 
-        vector<Instrument *> beat = mSeq.at(mPos);
+        vector<Instrument *> beat = m_seq.at(m_pos);
         for (auto &i : beat) {
             cout << "Will trigger " << i->getName() << endl;
             i->trigger();
-            mActiveSamples.push_back(i);
+            m_activeSamples.push_back(i);
         }
     } else {
-        for (auto s = mActiveSamples.begin(); s != mActiveSamples.end(); s++) {
+        for (auto s = m_activeSamples.begin(); s != m_activeSamples.end(); s++) {
             auto i = *s;
             i->updateBy(time);
             if (!i->isPlaying()){
                 i->release();
-                mActiveSamples.erase(s);
+                m_activeSamples.erase(s);
                 s--;
             }
         }
     }
 
-    mElapsed += time;
+    m_elapsed += time;
 }
 
 vector<Instrument *> Sequencer::getActiveSamples()
 {
-    return mActiveSamples;
+    return m_activeSamples;
 }
 

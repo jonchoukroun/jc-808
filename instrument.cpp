@@ -15,43 +15,43 @@ Instrument::~Instrument() {}
 
 void Instrument::trigger()
 {
-    mTriggered = true;
-    mPlaying = true;
-    mElapsed = 0.0;
+    m_triggered = true;
+    m_playing = true;
+    m_elapsed = 0.0;
 }
 
 void Instrument::release()
 {
-    mTriggered = false;
+    m_triggered = false;
 }
 
 bool Instrument::isTriggered()
 {
-    return mTriggered;
+    return m_triggered;
 }
 
 bool Instrument::isPlaying()
 {
-    return mPlaying;
+    return m_playing;
 }
 
 void Instrument::updateBy(double time)
 {
-    if (!mTriggered) return;
+    if (!m_triggered) return;
 
-    mElapsed += time;
-    if (mElapsed > mDuration) {
-        mPlaying = false;
-        mElapsed = 0.0;
+    m_elapsed += time;
+    if (m_elapsed > m_duration) {
+        m_playing = false;
+        m_elapsed = 0.0;
     }
 }
 
 double Instrument::getSample()
 {
-    return sin(mFreq * TAU * mElapsed) * mEnv.getAmplitude(mElapsed);
+    return sin(m_freq * TAU * m_elapsed) * m_env->getAmplitude(m_elapsed);
 }
 
 std::string Instrument::getName()
 {
-    return "-";
+    return m_name;
 }

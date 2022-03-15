@@ -26,14 +26,16 @@ public:
     static constexpr double TAU = M_PI * 2.0;
 
 protected:
-    int mFreq;
-    Envelope mEnv;
+    int m_freq;
+    Envelope *m_env;
 
-    double mDuration;
-    double mElapsed;
+    double m_duration;
+    double m_elapsed;
 
-    bool mTriggered;
-    bool mPlaying;
+    bool m_triggered;
+    bool m_playing;
+
+    std::string m_name;
 };
 
 #endif
