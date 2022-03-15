@@ -6,7 +6,8 @@ using std::endl;
 
 const double GAIN = 40000.0;
 
-AudioEngine::AudioEngine(Sequencer *seq)
+AudioEngine::AudioEngine(Sequencer &seq)
+: mSeq(seq)
 {
     SDL_AudioSpec desiredSpec;
     desiredSpec.freq = mSampleRate;
@@ -28,29 +29,28 @@ AudioEngine::AudioEngine(Sequencer *seq)
     }
 
     mPlaying = false;
-
-    mSeq = seq;
 }
 
 AudioEngine::~AudioEngine()
 {
-    delete [] mSeq;
-    mSeq = nullptr;
     SDL_CloseAudioDevice(mDeviceId);
+}
+
+Sequencer & AudioEngine::getSequencer()
+{
+    return mSeq;
 }
 
 void AudioEngine::start()
 {
-    if (mSeq == nullptr) return;
-
-    mSeq->start();
+    mSeq.start();
     mPlaying = true;
     SDL_PauseAudioDevice(mDeviceId, SDL_FALSE);
 }
 
 void AudioEngine::stop()
 {
-    mSeq->stop();
+    mSeq.stop();
     mPlaying = false;
     SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
 
@@ -78,15 +78,15 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
     for (int i = 0; i < (len / sizeof(short)); i++) {
         double output = 0.0;
 
-        vector<Instrument *> notes = mSeq->getActiveSamples();
-        for (auto n : notes) {
-            if (n->isPlaying()) {
-                output += n->getSample();
+        vector<Instrument *> beat = mSeq.getActiveSamples();
+        for (auto &i : beat) {
+            if (i->isPlaying()) {
+                output += i->getSample();
             }
         }
         out[i] = 0.8 * GAIN * output;
 
-        mSeq->updateBy(mTimeStep);
+        mSeq.updateBy(mTimeStep);
     }
 }
 
