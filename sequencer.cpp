@@ -1,6 +1,7 @@
 #include <iostream>
 // #include "clap.h"
 // #include "closed_hat.h"
+#include "envelope.h"
 #include "kick.h"
 #include "sequencer.h"
 // #include "snare.h"
@@ -30,7 +31,13 @@ using std::endl;
  **/
 void Sequencer::init()
 {
-    Kick *kick = new Kick(0.8, 0.5);
+    Kick *kick = new Kick();
+    Envelope::EnvSettings settings = {
+        .peakAmp = 0.8,
+        .decay = 0.5,
+    };
+    Envelope *env = new Envelope(settings);
+    kick->setEnvelope(env);
     setNote(*kick, 0);
 }
 void Sequencer::setTempo(double tempo)
