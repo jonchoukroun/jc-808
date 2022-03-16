@@ -1,33 +1,32 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
+#include <iostream>
 #include "snare.h"
 
-Snare::Snare(double amp, double decay, double snappy)
-: Instrument(mDefaultFreq, { amp, 0.001, decay }), mNoiseEnv({ snappy, 0.01, 0.4})
+Snare::Snare() : Instrument()
 {
-    mElapsed = 0.0;
-    mTriggered = false;
+    m_name = m_defaultName;
+    m_pitch = m_defaultPitch;
+}
 
-    mHighPass = new Filter(HIGHPASS);
-    mHighPass->setFilter(400, 5.0);
-    mBandPass = new Filter(BANDPASS);
-    mBandPass->setFilter(1000, 1.0);
+void Snare::setNoiseEnv(Envelope *env)
+{
+    m_noiseEnv = env;
+}
 
-    srand(time(0));
+void Snare::setBandPassFilter(Filter *filter)
+{
+    m_bandPass = filter;
 }
 
 double Snare::getSample()
 {
-    double tone = sin(TAU * mFreq * mElapsed) * mEnv.getAmplitude(mElapsed);
-    double filteredNoise = mBandPass->filter((double)rand() / RAND_MAX);
-    filteredNoise *= mNoiseEnv.getAmplitude(mElapsed);
+    double pitch = m_pitchEnv == nullptr ? m_pitch : m_pitchEnv->getPitch(m_elapsed);
+    double tone = sin(pitch * TAU * m_elapsed);
+    double toneAmp = m_env->getAmplitude(m_elapsed);
 
-    double blend = 0.5 * (tone + filteredNoise);
-    return mHighPass->filter(blend);
-}
-
-std::string Snare::getName()
-{
-    return mName;
+    double noise = m_bandPass->filter((double)rand() / RAND_MAX);
+    double noiseAmp = m_noiseEnv->getAmplitude(m_elapsed);
+    return (tone * toneAmp) + (noise * noiseAmp);
 }
