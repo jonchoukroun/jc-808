@@ -1,5 +1,5 @@
-#ifndef EnvelopeH
-#define EnvelopeH
+#ifndef ENVELOPE_H
+#define ENVELOPE_H
 
 class Envelope
 {
@@ -14,6 +14,7 @@ public:
     };
 
     Envelope(EnvSettings &);
+    ~Envelope() = default;
 
     void setStartAmp(double amp);
     void setPeakAmp(double amp);
@@ -30,7 +31,6 @@ private:
 
     double attackRamp(double time);
     double decayRamp(double time);
-    double releaseRamp(double time);
 };
 
 #endif
