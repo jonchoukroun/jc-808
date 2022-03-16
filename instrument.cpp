@@ -2,10 +2,28 @@
 #include <iostream>
 #include "instrument.h"
 
+using std::cout;
+using std::endl;
+
+int Instrument::getPitch()
+{
+    return m_pitch;
+}
+
+void Instrument::setPitch(int pitch)
+{
+    m_pitch = pitch;
+}
+
 void Instrument::setEnvelope(Envelope *env)
 {
     m_env = env;
     m_duration = env->getDuration();
+}
+
+void Instrument::setPitchEnv(PitchEnv *env)
+{
+    m_pitchEnv = env;
 }
 
 void Instrument::trigger()
@@ -43,7 +61,19 @@ void Instrument::updateBy(double time)
 
 double Instrument::getSample()
 {
-    return sin(m_freq * TAU * m_elapsed) * m_env->getAmplitude(m_elapsed);
+    double value;
+    if (m_pitchEnv == nullptr) {
+        value = sin(m_pitch * TAU * m_elapsed);
+    } else {
+        double pitch = m_pitchEnv->getPitch(m_elapsed);
+        value = sin(pitch * TAU * m_elapsed);
+    }
+
+    if (m_env != nullptr) {
+        value *= m_env->getAmplitude(m_elapsed);
+    }
+
+    return value;
 }
 
 std::string Instrument::getName()

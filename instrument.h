@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include "envelope.h"
+#include "pitch_env.h"
 
 class Instrument
 {
@@ -12,9 +13,12 @@ public:
     Instrument() = default;
     ~Instrument() = default;
 
+    int getPitch();
+    void setPitch(int pitch);
+
     void setEnvelope(Envelope *);
 
-    std::string getName();
+    void setPitchEnv(PitchEnv *);
 
     void trigger();
     void release();
@@ -25,14 +29,18 @@ public:
 
     virtual double getSample();
 
+    std::string getName();
+
     static constexpr double TAU = M_PI * 2.0;
 
 protected:
-    int m_freq;
-    Envelope *m_env;
+    Envelope *m_env = nullptr;
+    PitchEnv *m_pitchEnv = nullptr;
 
     double m_duration;
     double m_elapsed;
+
+    int m_pitch;
 
     bool m_triggered;
     bool m_playing;
