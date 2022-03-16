@@ -7,22 +7,26 @@
 class Clap : public Instrument
 {
 public:
-    Clap(double decay = 0.25);
+    Clap();
+    ~Clap() = default;
+
+    void setDefaults() override;
+
+    void setBandPassFilter(Filter *);
+    void setHighPassFilter(Filter *);
 
     double getSample() override;
 
-    std::string getName() override;
-
 private:
-    const std::string mName = "Clap";
+    const std::string m_defaultName = "Clap";
 
-    static const int mDefaultFreq = 200;
+    static const int m_defaultPitch = 200;
 
     // 10 ms between claps
-    static constexpr double mInterval = 0.01;
+    static constexpr double m_interval = 0.01;
 
-    Filter *mHighPass;
-    Filter *mBandPass;
+    Filter *m_highPass;
+    Filter *m_bandPass;
 };
 
 #endif
