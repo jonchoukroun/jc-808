@@ -4,5 +4,5 @@
 Kick::Kick()
 {
     m_name = m_defaultName;
-    m_freq = m_defaultFreq;
+    m_pitch = m_defaultPitch;
 }

@@ -11,7 +11,7 @@ public:
 
 private:
     const std::string m_defaultName = "Kick";
-    const int m_defaultFreq = 247;
+    const int m_defaultPitch = 47;
 };
 
 #endif
