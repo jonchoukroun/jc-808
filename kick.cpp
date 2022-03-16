@@ -11,7 +11,7 @@ void Kick::setDefaults()
 {
     Envelope::EnvSettings envSettings = {
         .peakAmp = 0.8,
-        .decay = 0.3,
+        .decay = 0.25,
     };
     Envelope *ampEnv = new Envelope(envSettings);
     setEnvelope(ampEnv);

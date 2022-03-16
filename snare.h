@@ -18,6 +18,7 @@ public:
     void setNoiseEnv(Envelope *);
 
     void setBandPassFilter(Filter *);
+    void setHighPassFilter(Filter *);
 
     double getSample() override;
 
@@ -28,6 +29,7 @@ private:
     const int m_defaultPitch = 160;
 
     Filter *m_bandPass;
+    Filter *m_highPass;
 
 };
 

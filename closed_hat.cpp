@@ -20,14 +20,14 @@ ClosedHat::ClosedHat()
 void ClosedHat::setDefaults()
 {
     Envelope::EnvSettings envSettings = {
-        .peakAmp = 0.6,
-        .decay = 0.02
+        .peakAmp = 0.8,
+        .decay = 0.2
     };
     Envelope *ampEnv = new Envelope(envSettings);
     setEnvelope(ampEnv);
 
     Filter *bandPass = new Filter(BANDPASS);
-    bandPass->setFilter(10000.0, 5.0);
+    bandPass->setFilter(8000.0, 8.0);
     setBandPassFilter(bandPass);
     Filter *highPass = new Filter(HIGHPASS);
     highPass->setFilter(7000.0, 1.0);

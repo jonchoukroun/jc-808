@@ -10,21 +10,12 @@ Snare::Snare() : Instrument()
     m_pitch = m_defaultPitch;
 }
 
-void Snare::setLevel(double level)
-{
-    m_env->setPeakAmp(level);
-}
-
-void Snare::setSnappy(double snappy)
-{
-    m_noiseEnv->setPeakAmp(snappy);
-}
-
 void Snare::setDefaults()
 {
     Envelope::EnvSettings toneEnvSettings = {
-        .peakAmp = 0.3,
-        .decay = 0.3,
+        .peakAmp = 0.1,
+        .attack = 0.01,
+        .decay = 0.25,
     };
     Envelope *toneEnv = new Envelope(toneEnvSettings);
     setEnvelope(toneEnv);
@@ -40,14 +31,33 @@ void Snare::setDefaults()
 
     Envelope::EnvSettings noiseEnvSettings = {
         .peakAmp = 0.6,
-        .decay = 0.4,
+        .decay = 0.25,
     };
     Envelope *noiseEnv = new Envelope(noiseEnvSettings);
     setNoiseEnv(noiseEnv);
 
-    Filter *filter = new Filter(BANDPASS);
-    filter->setFilter(1000.0, 2.0);
-    setBandPassFilter(filter);
+    m_duration = std::max(
+        (toneEnvSettings.attack + toneEnvSettings.decay),
+        (noiseEnvSettings.attack + noiseEnvSettings.decay)
+    );
+
+    Filter *bandPass = new Filter(BANDPASS);
+    bandPass->setFilter(2000.0, 2.0);
+    setBandPassFilter(bandPass);
+
+    // Filter *highPass = new Filter(HIGHPASS);
+    // highPass->setFilter(200, 2.0),
+    // setHighPassFilter(highPass);
+}
+
+void Snare::setLevel(double level)
+{
+    m_env->setPeakAmp(level);
+}
+
+void Snare::setSnappy(double snappy)
+{
+    m_noiseEnv->setPeakAmp(snappy);
 }
 
 void Snare::setNoiseEnv(Envelope *env)
@@ -58,6 +68,11 @@ void Snare::setNoiseEnv(Envelope *env)
 void Snare::setBandPassFilter(Filter *filter)
 {
     m_bandPass = filter;
+}
+
+void Snare::setHighPassFilter(Filter *filter)
+{
+    m_highPass = filter;
 }
 
 double Snare::getSample()
