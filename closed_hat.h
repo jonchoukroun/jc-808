@@ -8,23 +8,25 @@
 class ClosedHat : public Instrument
 {
 public:
-    ClosedHat(double amp = 0.8);
+    ClosedHat();
+    ~ClosedHat() = default;
+
+    void setDefaults() override;
+
+    void setBandPassFilter(Filter *);
+    void setHighPassFilter(Filter *);
 
     double getSample() override;
 
-    std::string getName() override;
-
 private:
-    const std::string mName = "Closed Hi-Hat";
+    const std::string m_defaultName = "Closed Hi-Hat";
 
-    static const int mBaseFreq = 40;
+    static const int m_basePitch = 40;
 
-    static constexpr double mDuration = 0.27;
+    std::array<double, 6> m_harmonics;
 
-    std::array<double, 6> mHarmonics;
-
-    Filter *mBandPass;
-    Filter *mHighPass;
+    Filter *m_bandPass;
+    Filter *m_highPass;
 };
 
 #endif
