@@ -7,6 +7,8 @@
 #include "envelope.h"
 #include "pitch_env.h"
 
+#define SEMITONE_HZ 1.06
+
 class Instrument
 {
 public:
@@ -15,6 +17,8 @@ public:
 
     int getPitch();
     void setPitch(int pitch);
+
+    virtual void setDefaults() = 0;
 
     void setEnvelope(Envelope *);
 

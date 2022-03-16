@@ -10,6 +10,11 @@ public:
     Snare();
     ~Snare() = default;
 
+    void setDefaults() override;
+
+    void setLevel(double level);
+    void setSnappy(double snappy);
+
     void setNoiseEnv(Envelope *);
 
     void setBandPassFilter(Filter *);

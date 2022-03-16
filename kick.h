@@ -9,6 +9,8 @@ public:
     Kick();
     ~Kick() = default;
 
+    void setDefaults() override;
+
 private:
     const std::string m_defaultName = "Kick";
     const int m_defaultPitch = 47;
