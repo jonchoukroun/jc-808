@@ -2,43 +2,59 @@
 #include <cmath>
 #include "clap.h"
 
-Clap::Clap(double decay)
-: Instrument(mDefaultFreq, { 0.8, 0.01, decay, true })
+Clap::Clap() : Instrument()
 {
-    mElapsed = 0.0;
-    mTriggered = false;
-
-    mHighPass = new Filter(HIGHPASS);
-    mHighPass->setFilter(800.0, 5.0);
-    mBandPass = new Filter(BANDPASS);
-    mBandPass->setFilter(1500.0, 1.5);
+    m_name = m_defaultName;
+    m_pitch = m_defaultPitch;
 
     srand(time(0));
+}
+
+void Clap::setDefaults()
+{
+    Envelope::EnvSettings envSettings = {
+        .peakAmp = 0.8,
+        .decay = 0.3
+    };
+    Envelope *ampEnv = new Envelope(envSettings);
+    setEnvelope(ampEnv);
+
+    Filter *bandPass = new Filter(BANDPASS);
+    bandPass->setFilter(1500.0, 1.5);
+    setBandPassFilter(bandPass);
+
+    Filter *highPass = new Filter(HIGHPASS);
+    highPass->setFilter(800.0, 5.0);
+    setHighPassFilter(highPass);
+}
+
+void Clap::setBandPassFilter(Filter *filter)
+{
+    m_bandPass = filter;
+}
+
+void Clap::setHighPassFilter(Filter *filter)
+{
+    m_highPass = filter;
 }
 
 double Clap::getSample()
 {
     double sample = 0.0;
-    if (mElapsed > mDuration) return sample;
+    if (m_elapsed > m_duration) return sample;
 
     double amp = 0.5;
     double noise = amp * (double)rand() / RAND_MAX;
-    if (mElapsed < mInterval * 2) {
+    if (m_elapsed < m_interval * 2) {
         for (double n = 1.0; n <= 40; n++) {
-            sample += sin(n * TAU * 100 * mElapsed) / n;
+            sample += sin(n * TAU * 100 * m_elapsed) / n;
         }
         sample *= noise * (2.0 / M_PI);
     } else {
         // TODO: replace with exponential Envelope decay
-        double decay = amp * pow(mDuration * 0.001, mElapsed);
+        double decay = amp * pow(m_duration * 0.001, m_elapsed);
         sample = noise * decay;
     }
 
-    return mHighPass->filter(mBandPass->filter(sample));
-}
-
-
-std::string Clap::getName()
-{
-    return mName;
+    return m_highPass->filter(m_bandPass->filter(sample));
 }

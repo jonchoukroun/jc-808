@@ -7,20 +7,30 @@
 class Snare : public Instrument
 {
 public:
-    Snare(double amp = 0.8, double decay = 0.25, double snappy = 0.1);
+    Snare();
+    ~Snare() = default;
+
+    void setDefaults() override;
+
+    void setLevel(double level);
+    void setSnappy(double snappy);
+
+    void setNoiseEnv(Envelope *);
+
+    void setBandPassFilter(Filter *);
+    void setHighPassFilter(Filter *);
 
     double getSample() override;
 
-    std::string getName() override;
-
 private:
-    static const int mDefaultFreq = 160;
-    Envelope mNoiseEnv;
+    Envelope *m_noiseEnv = nullptr;
 
-    Filter *mHighPass;
-    Filter *mBandPass;
+    const std::string m_defaultName = "Snare";
+    const int m_defaultPitch = 160;
 
-    const std::string mName = "Snare";
+    Filter *m_bandPass;
+    Filter *m_highPass;
+
 };
 
 #endif

@@ -4,9 +4,7 @@
 #include <array>
 #include <SDL2/SDL.h>
 #include <vector>
-#include "kick.h"
 #include "sequencer.h"
-#include "snare.h"
 
 using std::array;
 using std::vector;
@@ -14,8 +12,10 @@ using std::vector;
 class AudioEngine
 {
 public:
-    AudioEngine(Sequencer *seq);
+    AudioEngine(Sequencer &);
     ~AudioEngine();
+
+    Sequencer & getSequencer();
 
     void start();
     void stop();
@@ -24,20 +24,20 @@ public:
     SDL_AudioDeviceID getAudioDevice();
 
 private:
-    static const int mSampleRate = 44100;
-    static const int mSampleSize = 1024;
-    static const int mChannels = 1;
+    static const int m_sampleRate = 44100;
+    static const int m_sampleSize = 1024;
+    static const int m_channels = 1;
 
-    SDL_AudioDeviceID mDeviceId = 0;
-    SDL_AudioSpec mReceivedSpec;
+    SDL_AudioDeviceID m_deviceId = 0;
+    SDL_AudioSpec m_receivedSpec {};
+
+    static constexpr double m_timeStep = 1.0 / (double)m_sampleRate;
+    bool m_playing {false};
+
+    Sequencer &m_seq;
 
     static void audioCallback(void *userdata, Uint8 *stream, int len);
     void fillBuffer(const Uint8* const stream, int len);
-
-    static constexpr double mTimeStep = 1.0 / (double)mSampleRate;
-    bool mPlaying;
-
-    Sequencer *mSeq;
 
 };
 

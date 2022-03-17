@@ -6,64 +6,64 @@ using std::endl;
 
 const double GAIN = 40000.0;
 
-AudioEngine::AudioEngine(Sequencer *seq)
+AudioEngine::AudioEngine(Sequencer &seq)
+: m_seq(seq)
 {
     SDL_AudioSpec desiredSpec;
-    desiredSpec.freq = mSampleRate;
+    desiredSpec.freq = m_sampleRate;
     desiredSpec.format = AUDIO_S16;
     desiredSpec.channels = 1;
-    desiredSpec.samples = mSampleSize;
+    desiredSpec.samples = m_sampleSize;
     desiredSpec.callback = &audioCallback;
     desiredSpec.userdata = this;
 
-    mDeviceId = SDL_OpenAudioDevice(
+    m_deviceId = SDL_OpenAudioDevice(
         NULL,
         SDL_FALSE,
         &desiredSpec,
-        &mReceivedSpec,
+        &m_receivedSpec,
         0
     );
-    if (mDeviceId == 0) {
+    if (m_deviceId == 0) {
         cout << "Failed to open audio device! Error: " << SDL_GetError() << endl;
     }
 
-    mPlaying = false;
-
-    mSeq = seq;
+    m_playing = false;
 }
 
 AudioEngine::~AudioEngine()
 {
-    delete [] mSeq;
-    mSeq = nullptr;
-    SDL_CloseAudioDevice(mDeviceId);
+    SDL_CloseAudioDevice(m_deviceId);
+}
+
+Sequencer & AudioEngine::getSequencer()
+{
+    return m_seq;
 }
 
 void AudioEngine::start()
 {
-    if (mSeq == nullptr) return;
-
-    mSeq->start();
-    mPlaying = true;
-    SDL_PauseAudioDevice(mDeviceId, SDL_FALSE);
+    m_seq.start();
+    m_playing = true;
+    SDL_PauseAudioDevice(m_deviceId, SDL_FALSE);
 }
 
 void AudioEngine::stop()
 {
-    mSeq->stop();
-    mPlaying = false;
-    SDL_PauseAudioDevice(mDeviceId, SDL_TRUE);
+    m_seq.stop();
+    m_playing = false;
+    SDL_PauseAudioDevice(m_deviceId, SDL_TRUE);
 
 }
 
 bool AudioEngine::isPlaying()
 {
-    return mPlaying;
+    return m_playing;
 }
 
 SDL_AudioDeviceID AudioEngine::getAudioDevice()
 {
-    return mDeviceId;
+    return m_deviceId;
 }
 
 void AudioEngine::audioCallback(void *userdata, Uint8 *stream, int len)
@@ -78,15 +78,15 @@ void AudioEngine::fillBuffer(const Uint8* const stream, int len)
     for (int i = 0; i < (len / sizeof(short)); i++) {
         double output = 0.0;
 
-        vector<Instrument *> notes = mSeq->getActiveSamples();
-        for (auto n : notes) {
-            if (n->isPlaying()) {
-                output += n->getSample();
+        vector<Instrument *> beat = m_seq.getActiveSamples();
+        for (auto &i : beat) {
+            if (i->isPlaying()) {
+                output += i->getSample();
             }
         }
         out[i] = 0.8 * GAIN * output;
 
-        mSeq->updateBy(mTimeStep);
+        m_seq.updateBy(m_timeStep);
     }
 }
 

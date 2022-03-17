@@ -1,7 +1,10 @@
 #include <iostream>
 #include "clap.h"
 #include "closed_hat.h"
+#include "envelope.h"
+#include "filter.h"
 #include "kick.h"
+#include "pitch_env.h"
 #include "sequencer.h"
 #include "snare.h"
 
@@ -10,148 +13,142 @@
 using std::cout;
 using std::endl;
 
-void setSeq(Sequencer *seq);
-
-Sequencer::Sequencer()
+/**
+ *  0 1
+ *  1 e
+ *  2 +
+ *  3 a
+ *  4 2
+ *  5 e
+ *  6 +
+ *  7 a
+ *  8 3
+ *  9 e
+ * 10 +
+ * 11 a
+ * 12 4
+ * 13 e
+ * 14 +
+ * 15 a
+ **/
+void Sequencer::init()
 {
-    array<vector<Instrument *>, SUBDIVISION> seq;
-    for (int i = 0; i < SUBDIVISION; i++) {
-        vector<Instrument *> v;
-        seq[i] = v;
+    Kick *kick1 = new Kick();
+    kick1->setDefaults();
+    setNote(*kick1, 0);
+
+    // Snare *snare = new Snare();
+    // snare->setDefaults();
+    // setNote(*snare, 4);
+    Clap *clap1 = new Clap();
+    clap1->setDefaults();
+    setNote(*clap1, 4);
+
+    Kick *kick2 = new Kick();
+    kick2->setDefaults();
+    setNote(*kick2, 8);
+
+    Snare *ghost = new Snare();
+    ghost->setDefaults();
+    ghost->setLevel(0.04);
+    ghost->setSnappy(0.03);
+    setNote(*ghost, 7);
+
+    Snare *snare2 = new Snare();
+    snare2->setDefaults();
+    setNote(*snare2, 12);
+
+    Clap *clap2 = new Clap();
+    clap2->setDefaults();
+    setNote(*clap2, 12);
+
+    for (int i = 0; i < SUBDIVISION; ++i) {
+        if (i % 2 == 0) {
+            ClosedHat *hat = new ClosedHat();
+            hat->setDefaults();
+            setNote(*hat, i);
+        }
     }
-    mSeq = seq;
-
-    vector<Instrument *> samples;
-    mActiveSamples = samples;
-
-    mPlaying = false;
-
-    mTempo = 0.0;
-    mTempoStep = 0.0;
-    mElapsed = 0.0;
-
-    mPos = 0;
-
-    setSeq(this);
 }
-
-Sequencer::~Sequencer() {}
-
 void Sequencer::setTempo(double tempo)
 {
-    mTempo = tempo;
-    mTempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
+    m_tempo = tempo;
+    m_tempoStep = MS_PER_MINUTE / (tempo * 4) / 1000.0;
 }
 
-void Sequencer::setNote(Instrument *inst, int pos)
+void Sequencer::setNote(Instrument &inst, int pos)
 {
+    for (auto &beat : m_seq) {
+        for (auto i : beat) {
+        }
+    }
     if (pos >= SUBDIVISION) {
         cout << "Invalid note position" << endl;
         return;
     }
-    mSeq[pos].push_back(inst);
+    m_seq[pos].push_back(&inst);
+    for (auto &beat : m_seq) {
+        for (auto i : beat) {
+        }
+    }
 }
 
 void Sequencer::start()
 {
     // TODO: error handling UI
-    if (mTempo == 0.0) return;
+    if (m_tempo == 0.0) return;
 
-    vector<Instrument *> notes = mSeq[mPos];
-    for (auto n : notes) {
-        if (n == nullptr) {
+    vector<Instrument *> beat = m_seq.at(m_pos);
+    for (auto &i : beat) {
+        if (i == nullptr) {
             cout << "Undefined instrument" << endl;
             continue;
         }
-        n->trigger();
-        mActiveSamples.push_back(n);
+        i->trigger();
+        m_activeSamples.push_back(i);
     }
 
-    mPlaying = true;
+    m_playing = true;
 }
 
 void Sequencer::stop()
 {
-    mPlaying = false;
-    mElapsed = 0.0;
-    mPos = 0;
-    mActiveSamples.clear();
+    m_playing = false;
+    m_elapsed = 0.0;
+    m_pos = 0;
+    m_activeSamples.clear();
 }
 
 void Sequencer::updateBy(double time)
 {
-    if (mElapsed > mTempoStep) {
-        mElapsed = 0.0;
+    if (m_elapsed > m_tempoStep) {
+        m_elapsed = 0.0;
 
-        mPos++;
-        if (mPos >= SUBDIVISION) mPos = 0;
+        m_pos++;
+        if (m_pos >= SUBDIVISION) m_pos = 0;
 
-        vector<Instrument *> notes = mSeq[mPos];
-        for (auto i : notes) {
+        vector<Instrument *> beat = m_seq.at(m_pos);
+        for (auto &i : beat) {
             i->trigger();
-            mActiveSamples.push_back(i);
+            m_activeSamples.push_back(i);
         }
     } else {
-        for (auto s = mActiveSamples.begin(); s != mActiveSamples.end(); s++) {
-            Instrument *i = *s;
+        for (auto s = m_activeSamples.begin(); s != m_activeSamples.end(); s++) {
+            auto i = *s;
             i->updateBy(time);
             if (!i->isPlaying()){
                 i->release();
-                mActiveSamples.erase(s);
+                m_activeSamples.erase(s);
                 s--;
             }
         }
     }
 
-    mElapsed += time;
+    m_elapsed += time;
 }
 
 vector<Instrument *> Sequencer::getActiveSamples()
 {
-    return mActiveSamples;
+    return m_activeSamples;
 }
 
-void setSeq(Sequencer *seq)
-{
-    /**
-     *  0 1
-     *  1 e
-     *  2 +
-     *  3 a
-     *  4 2
-     *  5 e
-     *  6 +
-     *  7 a
-     *  8 3
-     *  9 e
-     * 10 +
-     * 11 a
-     * 12 4
-     * 13 e
-     * 14 +
-     * 15 a
-     **/
-    ClosedHat *hatBeat = new ClosedHat(0.7);
-    ClosedHat *hatOffBeat = new ClosedHat(0.4);
-
-    Kick *kick = new Kick(0.8, 0.15);
-    Kick *kickOff = new Kick(0.4, 0.15);
-
-    Snare *snare = new Snare();
-    Clap *clap = new Clap();
-
-    for (int i = 0; i < 16; i++) {
-        if (i % 2 == 0) {
-            seq->setNote(hatBeat, i);
-        } else {
-            seq->setNote(hatOffBeat, i);
-        }
-    }
-    seq->setNote(kick, 0);
-    seq->setNote(snare, 4);
-    // seq->setNote(new Clap(), 4);
-    seq->setNote(kickOff, 7);
-    seq->setNote(kick, 8);
-    // seq->setNote(new Snare(), 12);
-    seq->setNote(clap, 12);
-}

@@ -4,37 +4,55 @@
 using std::cout;
 using std::endl;
 
-ClosedHat::ClosedHat(double amp) : Instrument(mBaseFreq, { amp, .02, 0.3 })
+ClosedHat::ClosedHat()
+: Instrument()
 {
-    mHarmonics[0] = mBaseFreq * 2.0;
-    mHarmonics[1] = mBaseFreq * 3.0;
-    mHarmonics[2] = mBaseFreq * 4.16;
-    mHarmonics[3] = mBaseFreq * 5.43;
-    mHarmonics[4] = mBaseFreq * 6.79;
-    mHarmonics[5] = mBaseFreq * 8.21;
+    m_name = m_defaultName;
 
-    mBandPass = new Filter(BANDPASS);
-    mBandPass->setFilter(10000.0, 5.0);
-    mHighPass = new Filter(HIGHPASS);
-    mHighPass->setFilter(7000.0, 1.0);
+    m_harmonics[0] = m_basePitch * 2.0;
+    m_harmonics[1] = m_basePitch * 3.0;
+    m_harmonics[2] = m_basePitch * 4.16;
+    m_harmonics[3] = m_basePitch * 5.43;
+    m_harmonics[4] = m_basePitch * 6.79;
+    m_harmonics[5] = m_basePitch * 8.21;
+}
+
+void ClosedHat::setDefaults()
+{
+    Envelope::EnvSettings envSettings = {
+        .peakAmp = 0.8,
+        .decay = 0.2
+    };
+    Envelope *ampEnv = new Envelope(envSettings);
+    setEnvelope(ampEnv);
+
+    Filter *bandPass = new Filter(BANDPASS);
+    bandPass->setFilter(8000.0, 8.0);
+    setBandPassFilter(bandPass);
+    Filter *highPass = new Filter(HIGHPASS);
+    highPass->setFilter(7000.0, 1.0);
+    setHighPassFilter(highPass);
+}
+
+void ClosedHat::setBandPassFilter(Filter *filter)
+{
+    m_bandPass = filter;
+}
+
+void ClosedHat::setHighPassFilter(Filter *filter)
+{
+    m_highPass = filter;
 }
 
 double ClosedHat::getSample()
 {
-    static const int mFreq = 40;
-
     double amp = 0.0;
-    for (auto f : mHarmonics) {
-        double value = sin(f * TAU * mElapsed) > 0 ? 1.0 : 0.0;
+    for (auto f : m_harmonics) {
+        double value = sin(f * TAU * m_elapsed) > 0 ? 1.0 : 0.0;
         amp += value;
     }
-    amp /= mHarmonics.size();
-    double firstStep = mBandPass->filter(amp);
-    double secondStep = mHighPass->filter(firstStep);
-    return secondStep * mEnv.getAmplitude(mElapsed);
-}
-
-std::string ClosedHat::getName()
-{
-    return mName;
+    amp /= m_harmonics.size();
+    double firstStep = m_bandPass->filter(amp);
+    double secondStep = m_highPass->filter(firstStep);
+    return secondStep * m_env->getAmplitude(m_elapsed);
 }

@@ -1,14 +1,27 @@
 #include <cmath>
 #include "kick.h"
 
-Kick::Kick(double amp, double decay)
-: Instrument(mDefaultFreq, { amp, 0.002, decay })
+Kick::Kick() : Instrument()
 {
-    mElapsed = 0.0;
-    mTriggered = false;
+    m_name = m_defaultName;
+    m_pitch = m_defaultPitch;
 }
 
-std::string Kick::getName()
+void Kick::setDefaults()
 {
-    return mName;
+    Envelope::EnvSettings envSettings = {
+        .peakAmp = 0.8,
+        .decay = 0.25,
+    };
+    Envelope *ampEnv = new Envelope(envSettings);
+    setEnvelope(ampEnv);
+
+    PitchEnv::EnvSettings pitchEnvSettings = {
+        .startPitch = (double)getPitch(),
+        .attackPitch = getPitch() + SEMITONE_HZ * 24.0,
+        .releasePitch = (double)getPitch(),
+        .decay = 0.02,
+    };
+    PitchEnv *pitchEnv = new PitchEnv(pitchEnvSettings);
+    setPitchEnv(pitchEnv);
 }

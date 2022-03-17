@@ -16,12 +16,14 @@ const int SAMPLE_RATE = 44100;
 class Sequencer
 {
 public:
-    Sequencer();
-    ~Sequencer();
+    Sequencer() = default;
+    ~Sequencer() = default;
+
+    void init();
 
     void setTempo(double tempo);
 
-    void setNote(Instrument *inst, int pos);
+    void setNote(Instrument &inst, int pos);
 
     void start();
     void stop();
@@ -32,17 +34,17 @@ public:
     bool isPlaying();
 
 private:
-    array<vector<Instrument *>, SUBDIVISION> mSeq;
+    array<vector<Instrument *>, SUBDIVISION> m_seq;
 
-    vector<Instrument *> mActiveSamples;
+    vector<Instrument *> m_activeSamples;
 
-    bool mPlaying;
+    bool m_playing {false};
 
-    double mTempo;
-    double mTempoStep;
-    double mElapsed;
+    double m_tempo {};
+    double m_tempoStep {};
+    double m_elapsed {};
 
-    int mPos;
+    int m_pos {};
 };
 
 #endif

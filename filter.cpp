@@ -2,16 +2,13 @@
 #include "filter.h"
 
 Filter::Filter(int type)
-{
-    mType = type;
-}
-
-Filter::~Filter() {}
+: m_type(type)
+{}
 
 void Filter::setFilter(double freq, double q)
 {
-    mFreq = freq / (double)mSampleRate;
-    mQ = q;
+    m_freq = freq / (double)m_sampleRate;
+    m_q = q;
     calcFilter();
 }
 
@@ -26,25 +23,25 @@ double Filter::filter(double input)
 void Filter::calcFilter()
 {
     double norm;
-    double K = std::tan(M_PI * mFreq);
-    switch (mType)
+    double K = std::tan(M_PI * m_freq);
+    switch (m_type)
     {
     case BANDPASS:
-        norm = 1 / (1 + K / mQ + K * K);
-        a0 = K / mQ * norm;
+        norm = 1 / (1 + K / m_q + K * K);
+        a0 = K / m_q * norm;
         a1 = 0;
         a2 = -a0;
         b1 = 2 * (K * K - 1) * norm;
-        b2 = (1 - K / mQ + K * K) * norm;
+        b2 = (1 - K / m_q + K * K) * norm;
         break;
 
     case HIGHPASS:
-        norm = 1 / (1 + K / mQ + K * K);
+        norm = 1 / (1 + K / m_q + K * K);
         a0 = 1 * norm;
         a1 = -2 * a0;
         a2 = a0;
         b1 = 2 * (K * K - 1) *norm;
-        b2 = (1 - K / mQ + K * K) * norm;
+        b2 = (1 - K / m_q + K * K) * norm;
         break;
 
     default:

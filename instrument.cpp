@@ -2,56 +2,81 @@
 #include <iostream>
 #include "instrument.h"
 
-Instrument::Instrument(int freq, Envelope env)
-: mFreq(freq), mEnv(env)
+using std::cout;
+using std::endl;
+
+int Instrument::getPitch()
 {
-    mDuration = mEnv.getDuration();
-    mElapsed = 0.0;
-    mTriggered = false;
-    mPlaying = false;
+    return m_pitch;
 }
 
-Instrument::~Instrument() {}
+void Instrument::setPitch(int pitch)
+{
+    m_pitch = pitch;
+}
+
+void Instrument::setEnvelope(Envelope *env)
+{
+    m_env = env;
+    m_duration = env->getDuration();
+}
+
+void Instrument::setPitchEnv(PitchEnv *env)
+{
+    m_pitchEnv = env;
+}
 
 void Instrument::trigger()
 {
-    mTriggered = true;
-    mPlaying = true;
-    mElapsed = 0.0;
+    m_triggered = true;
+    m_playing = true;
+    m_elapsed = 0.0;
 }
 
 void Instrument::release()
 {
-    mTriggered = false;
+    m_triggered = false;
 }
 
 bool Instrument::isTriggered()
 {
-    return mTriggered;
+    return m_triggered;
 }
 
 bool Instrument::isPlaying()
 {
-    return mPlaying;
+    return m_playing;
 }
 
 void Instrument::updateBy(double time)
 {
-    if (!mTriggered) return;
+    if (!m_triggered) return;
 
-    mElapsed += time;
-    if (mElapsed > mDuration) {
-        mPlaying = false;
-        mElapsed = 0.0;
+    m_elapsed += time;
+    if (m_elapsed > m_duration) {
+        m_playing = false;
+        m_elapsed = 0.0;
     }
 }
 
 double Instrument::getSample()
 {
-    return sin(mFreq * TAU * mElapsed) * mEnv.getAmplitude(mElapsed);
+    double value;
+    if (m_pitchEnv == nullptr) {
+        value = sin(m_pitch * TAU * m_elapsed);
+    } else {
+        double pitch = m_pitchEnv->getPitch(m_elapsed);
+        value = sin(pitch * TAU * m_elapsed);
+    }
+
+    if (m_env != nullptr) {
+        value *= m_env->getAmplitude(m_elapsed);
+    }
+
+    return value;
 }
 
 std::string Instrument::getName()
 {
-    return "-";
+    return m_name;
 }

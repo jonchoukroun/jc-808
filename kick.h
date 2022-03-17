@@ -6,14 +6,14 @@
 class Kick : public Instrument
 {
 public:
-    Kick(double amp = 0.8, double decay = 0.2);
+    Kick();
+    ~Kick() = default;
 
-    std::string getName() override;
+    void setDefaults() override;
 
 private:
-    const std::string mName = "Kick";
-
-    static const int mDefaultFreq = 47;
+    const std::string m_defaultName = "Kick";
+    const int m_defaultPitch = 47;
 };
 
 #endif
