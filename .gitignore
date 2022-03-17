@@ -6,3 +6,5 @@
 .DS_Store
 
 *.dSYM/
+*.o
+jc-808
