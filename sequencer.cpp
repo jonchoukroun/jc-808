@@ -1,10 +1,12 @@
 #include <iostream>
-// #include "clap.h"
-// #include "closed_hat.h"
+#include "clap.h"
+#include "closed_hat.h"
 #include "envelope.h"
+#include "filter.h"
 #include "kick.h"
+#include "pitch_env.h"
 #include "sequencer.h"
-// #include "snare.h"
+#include "snare.h"
 
 #define MS_PER_MINUTE 60000.0
 
@@ -31,14 +33,42 @@ using std::endl;
  **/
 void Sequencer::init()
 {
-    Kick *kick = new Kick();
-    Envelope::EnvSettings settings = {
-        .peakAmp = 0.8,
-        .decay = 0.5,
-    };
-    Envelope *env = new Envelope(settings);
-    kick->setEnvelope(env);
-    setNote(*kick, 0);
+    Kick *kick1 = new Kick();
+    kick1->setDefaults();
+    setNote(*kick1, 0);
+
+    // Snare *snare = new Snare();
+    // snare->setDefaults();
+    // setNote(*snare, 4);
+    Clap *clap1 = new Clap();
+    clap1->setDefaults();
+    setNote(*clap1, 4);
+
+    Kick *kick2 = new Kick();
+    kick2->setDefaults();
+    setNote(*kick2, 8);
+
+    Snare *ghost = new Snare();
+    ghost->setDefaults();
+    ghost->setLevel(0.04);
+    ghost->setSnappy(0.03);
+    setNote(*ghost, 7);
+
+    Snare *snare2 = new Snare();
+    snare2->setDefaults();
+    setNote(*snare2, 12);
+
+    Clap *clap2 = new Clap();
+    clap2->setDefaults();
+    setNote(*clap2, 12);
+
+    for (int i = 0; i < SUBDIVISION; ++i) {
+        if (i % 2 == 0) {
+            ClosedHat *hat = new ClosedHat();
+            hat->setDefaults();
+            setNote(*hat, i);
+        }
+    }
 }
 void Sequencer::setTempo(double tempo)
 {
@@ -48,22 +78,17 @@ void Sequencer::setTempo(double tempo)
 
 void Sequencer::setNote(Instrument &inst, int pos)
 {
-    cout << "Before" << endl;
     for (auto &beat : m_seq) {
         for (auto i : beat) {
-            cout << "inst at " << &i << endl;
         }
     }
     if (pos >= SUBDIVISION) {
         cout << "Invalid note position" << endl;
         return;
     }
-    cout << "Will push back " << inst.getName() << endl;
     m_seq[pos].push_back(&inst);
-    cout << "After" << endl;
     for (auto &beat : m_seq) {
         for (auto i : beat) {
-            cout << "inst at " << &i << endl;
         }
     }
 }
@@ -79,7 +104,6 @@ void Sequencer::start()
             cout << "Undefined instrument" << endl;
             continue;
         }
-        cout << "start | will trigger " << i->getName() << endl;
         i->trigger();
         m_activeSamples.push_back(i);
     }
@@ -105,7 +129,6 @@ void Sequencer::updateBy(double time)
 
         vector<Instrument *> beat = m_seq.at(m_pos);
         for (auto &i : beat) {
-            cout << "Will trigger " << i->getName() << endl;
             i->trigger();
             m_activeSamples.push_back(i);
         }
