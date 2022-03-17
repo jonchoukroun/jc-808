@@ -15,9 +15,14 @@ void Instrument::setPitch(int pitch)
     m_pitch = pitch;
 }
 
-void Instrument::setEnvelope(Envelope *env)
+void Instrument::setLevel(double level)
 {
-    m_env = env;
+    m_ampEnv->setPeak(level);
+}
+
+void Instrument::setAmpEnv(AmpEnv *env)
+{
+    m_ampEnv = env;
     m_duration = env->getDuration();
 }
 
@@ -65,12 +70,12 @@ double Instrument::getSample()
     if (m_pitchEnv == nullptr) {
         value = sin(m_pitch * TAU * m_elapsed);
     } else {
-        double pitch = m_pitchEnv->getPitch(m_elapsed);
+        double pitch = m_pitchEnv->getEnvValue(m_elapsed);
         value = sin(pitch * TAU * m_elapsed);
     }
 
-    if (m_env != nullptr) {
-        value *= m_env->getAmplitude(m_elapsed);
+    if (m_ampEnv != nullptr) {
+        value *= m_ampEnv->getEnvValue(m_elapsed);
     }
 
     return value;

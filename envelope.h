@@ -1,36 +1,42 @@
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 
+/**
+ * This abstract class is the base for all ADSR implementations.
+ *
+ * For now it only supports attack and decay stages.
+ **/
 class Envelope
 {
 public:
-    struct EnvSettings {
-        double startAmp;
-        double peakAmp;
-        double endAmp;
-
-        double attack;
-        double decay;
-    };
-
-    Envelope(EnvSettings &);
+    Envelope() = default;
     ~Envelope() = default;
 
-    void setStartAmp(double amp);
-    void setPeakAmp(double amp);
-    void setEndAmp(double amp);
-    void setAttack(double attack);
-    void setDecay(double decay);
     double getDuration();
 
-    double getAmplitude(double time);
+    void setAttack(double attack);
+    void setDecay(double decay);
 
-private:
-    EnvSettings m_settings;
+    void setStart(double start);
+    void setPeak(double peak);
+    void setRelease(double release);
+
+    double getEnvValue(double time);
+
+protected:
+    double m_attack;
+    double m_decay;
     double m_duration;
 
+    double m_start;
+    double m_peak;
+    double m_release;
+
+private:
     double attackRamp(double time);
+
     double decayRamp(double time);
+
 };
 
 #endif

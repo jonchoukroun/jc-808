@@ -19,12 +19,12 @@ ClosedHat::ClosedHat()
 
 void ClosedHat::setDefaults()
 {
-    Envelope::EnvSettings envSettings = {
+    AmpEnv::AmpEnvSettings envSettings = {
         .peakAmp = 0.8,
         .decay = 0.2
     };
-    Envelope *ampEnv = new Envelope(envSettings);
-    setEnvelope(ampEnv);
+    AmpEnv *ampEnv = new AmpEnv(envSettings);
+    setAmpEnv(ampEnv);
 
     Filter *bandPass = new Filter(BANDPASS);
     bandPass->setFilter(8000.0, 8.0);
@@ -54,5 +54,5 @@ double ClosedHat::getSample()
     amp /= m_harmonics.size();
     double firstStep = m_bandPass->filter(amp);
     double secondStep = m_highPass->filter(firstStep);
-    return secondStep * m_env->getAmplitude(m_elapsed);
+    return secondStep * m_ampEnv->getEnvValue(m_elapsed);
 }

@@ -12,12 +12,12 @@ Clap::Clap() : Instrument()
 
 void Clap::setDefaults()
 {
-    Envelope::EnvSettings envSettings = {
+    AmpEnv::AmpEnvSettings envSettings = {
         .peakAmp = 0.8,
         .decay = 0.3
     };
-    Envelope *ampEnv = new Envelope(envSettings);
-    setEnvelope(ampEnv);
+    AmpEnv *ampEnv = new AmpEnv(envSettings);
+    setAmpEnv(ampEnv);
 
     Filter *bandPass = new Filter(BANDPASS);
     bandPass->setFilter(1500.0, 1.5);
@@ -51,7 +51,7 @@ double Clap::getSample()
         }
         sample *= noise * (2.0 / M_PI);
     } else {
-        // TODO: replace with exponential Envelope decay
+        // TODO: replace with exponential AmpEnv decay
         double decay = amp * pow(m_duration * 0.001, m_elapsed);
         sample = noise * decay;
     }

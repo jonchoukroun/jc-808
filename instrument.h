@@ -4,7 +4,7 @@
 #include <cmath>
 #include <optional>
 #include <string>
-#include "envelope.h"
+#include "amp_env.h"
 #include "pitch_env.h"
 
 #define SEMITONE_HZ 1.06
@@ -18,9 +18,11 @@ public:
     int getPitch();
     void setPitch(int pitch);
 
+    void setLevel(double level);
+
     virtual void setDefaults() = 0;
 
-    void setEnvelope(Envelope *);
+    void setAmpEnv(AmpEnv *);
 
     void setPitchEnv(PitchEnv *);
 
@@ -38,7 +40,7 @@ public:
     static constexpr double TAU = M_PI * 2.0;
 
 protected:
-    Envelope *m_env = nullptr;
+    AmpEnv *m_ampEnv = nullptr;
     PitchEnv *m_pitchEnv = nullptr;
 
     double m_duration;

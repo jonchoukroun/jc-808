@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "kick.h"
 
 Kick::Kick() : Instrument()
@@ -9,16 +10,16 @@ Kick::Kick() : Instrument()
 
 void Kick::setDefaults()
 {
-    Envelope::EnvSettings envSettings = {
+    AmpEnv::AmpEnvSettings envSettings = {
         .peakAmp = 0.8,
         .decay = 0.25,
     };
-    Envelope *ampEnv = new Envelope(envSettings);
-    setEnvelope(ampEnv);
+    AmpEnv *ampEnv = new AmpEnv(envSettings);
+    setAmpEnv(ampEnv);
 
     PitchEnv::EnvSettings pitchEnvSettings = {
         .startPitch = (double)getPitch(),
-        .attackPitch = getPitch() + SEMITONE_HZ * 24.0,
+        .peakPitch = getPitch() + SEMITONE_HZ * 48.0,
         .releasePitch = (double)getPitch(),
         .decay = 0.02,
     };

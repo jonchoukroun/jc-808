@@ -1,63 +1,56 @@
 #include <iostream>
 #include "envelope.h"
 
-using std::cout;
-using std::endl;
-
-Envelope::Envelope(EnvSettings &settings)
-: m_settings(settings)
-, m_duration(settings.attack + settings.decay) {};
-
-void Envelope::setStartAmp(double amp)
-{
-    m_settings.startAmp = amp;
-}
-
-void Envelope::setPeakAmp(double amp)
-{
-    m_settings.peakAmp = amp;
-}
-
-void Envelope::setEndAmp(double amp)
-{
-    m_settings.endAmp = amp;
-}
-
-void Envelope::setAttack(double attack)
-{
-    m_settings.attack = attack;
-}
-
-void Envelope::setDecay(double decay)
-{
-    m_settings.decay = decay;
-}
-
-double Envelope::getAmplitude(double time)
-{
-    if (time > m_duration) return 0.0;
-
-    if (time <= m_settings.attack) {
-        return attackRamp(time);
-    } else if (time <= m_settings.attack + m_settings.decay) {
-        return decayRamp(time);
-    } else {
-        std::cout << "Invalid time " << time << " for envelope."  << std::endl;
-        return 0.0;
-    }
-}
-
 double Envelope::getDuration()
 {
     return m_duration;
 }
 
+void Envelope::setAttack(double attack)
+{
+    m_attack = attack;
+}
+
+void Envelope::setDecay(double decay)
+{
+    m_decay = decay;
+}
+
+void Envelope::setStart(double start)
+{
+    m_start = start;
+}
+
+void Envelope::setPeak(double peak)
+{
+    m_peak = peak;
+}
+
+void Envelope::setRelease(double release)
+{
+    m_release = release;
+}
+
+double Envelope::getEnvValue(double time)
+{
+    if (time > m_duration) return m_release;
+
+    if (time <= m_attack) {
+        return attackRamp(time);
+    } else if (time <= (m_attack + m_decay)) {
+        return decayRamp(time);
+    } else {
+        std::cout << "ERROR: Invalid time for envelope" << std::endl;
+        return m_release;
+    }
+}
+
 double Envelope::attackRamp(double time)
 {
-    return (m_settings.peakAmp - m_settings.startAmp) / m_settings.attack * time;
+    return (m_peak - m_start) / m_attack * time + m_start;
 }
 
 double Envelope::decayRamp(double time)
 {
-    return (m_settings.endAmp - m_settings.peakAmp) / m_settings.decay * (time - m_settings.attack) + m_settings.peakAmp;
+    return (m_release - m_peak) / m_decay * (time - m_attack) + m_peak;
 }

@@ -12,10 +12,9 @@ public:
 
     void setDefaults() override;
 
-    void setLevel(double level);
     void setSnappy(double snappy);
 
-    void setNoiseEnv(Envelope *);
+    void setNoiseEnv(AmpEnv *);
 
     void setBandPassFilter(Filter *);
     void setHighPassFilter(Filter *);
@@ -23,7 +22,7 @@ public:
     double getSample() override;
 
 private:
-    Envelope *m_noiseEnv = nullptr;
+    AmpEnv *m_noiseEnv = nullptr;
 
     const std::string m_defaultName = "Snare";
     const int m_defaultPitch = 160;
