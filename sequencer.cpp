@@ -37,26 +37,18 @@ void Sequencer::init()
     kick1->setDefaults();
     setNote(*kick1, 0);
 
-    // Snare *snare = new Snare();
-    // snare->setDefaults();
-    // setNote(*snare, 4);
     Clap *clap1 = new Clap();
     clap1->setDefaults();
     setNote(*clap1, 4);
 
     Kick *kick2 = new Kick();
     kick2->setDefaults();
-    setNote(*kick2, 8);
+    kick2->setLevel(0.4);
+    setNote(*kick2, 7);
 
-    Snare *ghost = new Snare();
-    ghost->setDefaults();
-    ghost->setLevel(0.04);
-    ghost->setSnappy(0.03);
-    setNote(*ghost, 7);
-
-    Snare *snare2 = new Snare();
-    snare2->setDefaults();
-    setNote(*snare2, 12);
+    Kick *kick3 = new Kick();
+    kick3->setDefaults();
+    setNote(*kick3, 8);
 
     Clap *clap2 = new Clap();
     clap2->setDefaults();
@@ -67,6 +59,10 @@ void Sequencer::init()
             ClosedHat *hat = new ClosedHat();
             hat->setDefaults();
             setNote(*hat, i);
+
+            if (i % 4 != 0) {
+                hat->setLevel(0.4);
+            }
         }
     }
 }
